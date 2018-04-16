@@ -1,10 +1,11 @@
 package me.duncte123.botCommons.web;
 
-import me.duncte123.botCommons.BuildConfig;
-import me.duncte123.botCommons.config.Config;
+import com.afollestad.ason.Ason;
 import com.github.natanbc.reliqua.Reliqua;
 import com.github.natanbc.reliqua.request.PendingRequest;
 import com.github.natanbc.reliqua.util.RequestMapper;
+import me.duncte123.botCommons.BuildConfig;
+import me.duncte123.botCommons.config.Config;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,6 +35,10 @@ public final class WebUtils extends Reliqua {
 
     public PendingRequest<JSONArray> getJSONArray(String url) throws NullPointerException {
         return prepareGet(url, EncodingType.APPLICATION_JSON, (r) -> new JSONArray(r.string()));
+    }
+
+    public PendingRequest<Ason> getAson(String url) throws NullPointerException {
+        return prepareGet(url, EncodingType.APPLICATION_JSON, (r) -> new Ason(r.string()));
     }
 
     public PendingRequest<InputStream> getInputStream(String url) throws NullPointerException {
