@@ -1,0 +1,101 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id 'de.fuerstenau.buildconfig' version '1.1.8'
+}
+
+group = "me.duncte123"
+archivesBaseName = "botCommons"
+version = "0.1.0"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile group: 'com.afollestad', name: 'ason', version: '1.4.16'
+    compile group: 'org.apache.commons', name: 'commons-text', version: '1.1'
+    compile group: 'com.google.guava', name: 'guava', version: '24.0-jre'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.9.1'
+    compile( group: 'com.github.natanbc', name: 'reliqua', version: '1.2' ) {
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+    }
+}
+
+javadoc {
+    failOnError = false
+    options.memberLevel = JavadocMemberLevel.PUBLIC
+    options.author()
+    options.encoding = 'UTF-8'
+    options.addStringOption('-html5')
+}
+
+buildConfig {
+    appName = project.name
+    version = project.version
+    packageName = project.group + "." + project.archivesBaseName
+    charset = 'UTF-8'
+
+    clsName = 'BuildConfig'
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    classifier = "jar"
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    from sourceSets.main.output
+    from sourceSets.main.allSource
+    classifier = null
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+publishing {
+    publications {
+        MavenProject(MavenPublication) {
+            from components.java
+            groupId group
+            artifactId archivesBaseName
+            version = version
+
+            artifact javadocJar
+            artifact sourcesJar
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            // change to point to your repo, e.g. http://my.org/repo
+            url "$buildDir/repo"
+        }
+    }
+}
+
+
+build {
+    dependsOn clean
+    dependsOn jar
+    dependsOn javadocJar
+    dependsOn sourcesJar
+    dependsOn publish
+
+    jar.mustRunAfter clean
+    javadocJar.mustRunAfter jar
+    sourcesJar.mustRunAfter javadocJar
+    publish.mustRunAfter sourcesJar
+}
+
