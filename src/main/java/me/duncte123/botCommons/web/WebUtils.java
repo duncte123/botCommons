@@ -216,7 +216,7 @@ public final class WebUtils extends Reliqua {
         }
     }
 
-    private static class WebUtilsErrorUtils {
+    public static class WebUtilsErrorUtils {
         public static JSONObject toJSONObject(Response response) {
             return new JSONObject(new JSONTokener(getInputStream(response)));
         }
