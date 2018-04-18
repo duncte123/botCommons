@@ -27,7 +27,11 @@ import java.util.zip.InflaterInputStream;
 public final class WebUtils extends Reliqua {
 
     public static final WebUtils ins = new WebUtils();
-    private static final String USER_AGENT = "Mozilla/5.0 (compatible; BotCommons/" + BuildConfig.VERSION + "; +https://github.com/duncte123/BotCommons;)";
+    private static String USER_AGENT = "Mozilla/5.0 (compatible; BotCommons/" + BuildConfig.VERSION + "; +https://github.com/duncte123/BotCommons;)";
+
+    public static void setUserAgent(String userAgent) {
+        USER_AGENT = userAgent;
+    }
 
     private WebUtils() {
         super(new OkHttpClient());
