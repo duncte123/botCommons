@@ -1,26 +1,40 @@
+/*
+ *    Copyright 2018 Duncan "duncte123" Sterken
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package me.duncte123.botCommons.web;
 
 import com.afollestad.ason.Ason;
 import com.github.natanbc.reliqua.Reliqua;
 import com.github.natanbc.reliqua.request.PendingRequest;
-import com.github.natanbc.reliqua.request.RequestContext;
-import com.github.natanbc.reliqua.request.RequestException;
 import com.github.natanbc.reliqua.util.PendingRequestBuilder;
 import com.github.natanbc.reliqua.util.ResponseMapper;
 import me.duncte123.botCommons.BuildConfig;
 import me.duncte123.botCommons.config.Config;
-import okhttp3.*;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.InflaterInputStream;
 
 
 @SuppressWarnings({"unused", "WeakerAccess", "ConstantConditions"})
@@ -29,43 +43,50 @@ public final class WebUtils extends Reliqua {
     public static final WebUtils ins = new WebUtils();
     private static String USER_AGENT = "Mozilla/5.0 (compatible; BotCommons/" + BuildConfig.VERSION + "; +https://github.com/duncte123/BotCommons;)";
 
-    public static void setUserAgent(String userAgent) {
-        USER_AGENT = userAgent;
-    }
-
     private WebUtils() {
         super(new OkHttpClient());
     }
 
-    public PendingRequest<String> getText(String url) throws NullPointerException {
+    public static void setUserAgent(String userAgent) {
+        USER_AGENT = userAgent;
+    }
+
+    public PendingRequest<String> getText(String url) {
         return prepareGet(url).build(
                 (response) -> response.body().string(),
                 WebUtilsErrorUtils::handleError
         );
     }
 
-    public PendingRequest<JSONObject> getJSONObject(String url) throws NullPointerException {
+    public PendingRequest<Document> scrapeWebPage(String url) {
+        return prepareGet(url, EncodingType.TEXT_HTML).build(
+                (response) -> Jsoup.parse(response.body().string()),
+                WebUtilsErrorUtils::handleError
+        );
+    }
+
+    public PendingRequest<JSONObject> getJSONObject(String url) {
         return prepareGet(url, EncodingType.APPLICATION_JSON).build(
                 (response) -> new JSONObject(response.body().string()),
                 WebUtilsErrorUtils::handleError
         );
     }
 
-    public PendingRequest<JSONArray> getJSONArray(String url) throws NullPointerException {
+    public PendingRequest<JSONArray> getJSONArray(String url) {
         return prepareGet(url, EncodingType.APPLICATION_JSON).build(
                 (response) -> new JSONArray(response.body().string()),
                 WebUtilsErrorUtils::handleError
         );
     }
 
-    public PendingRequest<Ason> getAson(String url) throws NullPointerException {
+    public PendingRequest<Ason> getAson(String url) {
         return prepareGet(url, EncodingType.APPLICATION_JSON).build(
                 (response) -> new Ason(response.body().string()),
                 WebUtilsErrorUtils::handleError
         );
     }
 
-    public PendingRequest<InputStream> getInputStream(String url) throws NullPointerException {
+    public PendingRequest<InputStream> getInputStream(String url) {
         return prepareGet(url).build(
                 (response) -> response.body().byteStream(),
                 WebUtilsErrorUtils::handleError
@@ -132,16 +153,16 @@ public final class WebUtils extends Reliqua {
                 .build(
                         mapper,
                         WebUtilsErrorUtils::handleError
-        );
+                );
     }
 
-    public JSONArray translate(String sourceLang, String targetLang, String input) throws NullPointerException {
+    public JSONArray translate(String sourceLang, String targetLang, String input) {
         return getJSONArray(
                 "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sourceLang + "&tl=" + targetLang + "&dt=t&q=" + input
         ).execute().getJSONArray(0).getJSONArray(0);
     }
 
-    public PendingRequest<String> shortenUrl(String url, String apiKey) throws NullPointerException {
+    public PendingRequest<String> shortenUrl(String url, String apiKey) {
         return postJSON(
                 "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=" +
                         apiKey,
@@ -164,30 +185,30 @@ public final class WebUtils extends Reliqua {
                         .url(s.url + "documents")).build(mapper, WebUtilsErrorUtils::handleError);
     }
 
-    public PendingRequest<String> leeks(String data) throws NullPointerException {
+    public PendingRequest<String> leeks(String data) {
         Service leeks = Service.LEEKS;
         return postRawToService(leeks, data,
                 (r) -> leeks.url + new JSONObject(r.body().string()).getString("key") + ".kt");
     }
 
-    public PendingRequest<String> hastebin(String data) throws NullPointerException {
+    public PendingRequest<String> hastebin(String data) {
         Service hastebin = Service.HASTEBIN;
         return postRawToService(hastebin, data,
                 (r) -> hastebin.url + new JSONObject(r.body().string()).getString("key") + ".kt");
     }
 
-    public PendingRequest<String> wastebin(String data) throws NullPointerException {
+    public PendingRequest<String> wastebin(String data) {
         Service wastebin = Service.WASTEBIN;
         return postRawToService(wastebin, data,
                 (r) -> wastebin.url + new JSONObject(r.body().string()).getString("key") + ".kt");
     }
 
     public enum EncodingType {
-        TEXT_PLAIN("text/plain"),
         APPLICATION_JSON("application/json"),
-        TEXT_HTML("text/html"),
         APPLICATION_XML("application/xml"),
-        APPLICATION_URLENCODED("application/x-www-form-urlencoded");
+        APPLICATION_URLENCODED("application/x-www-form-urlencoded"),
+        TEXT_PLAIN("text/plain"),
+        TEXT_HTML("text/html");
 
         private String type;
 
@@ -220,55 +241,4 @@ public final class WebUtils extends Reliqua {
         }
     }
 
-    public static class WebUtilsErrorUtils {
-        public static JSONObject toJSONObject(Response response) {
-            return new JSONObject(new JSONTokener(getInputStream(response)));
-        }
-
-        public static InputStream getInputStream(Response response) {
-            ResponseBody body = response.body();
-            if(body == null) throw new IllegalStateException("Body should never be null");
-            String encoding = response.header("Content-Encoding");
-            if (encoding != null) {
-                switch(encoding.toLowerCase()) {
-                    case "gzip":
-                        try {
-                            return new GZIPInputStream(body.byteStream());
-                        } catch(IOException e) {
-                            throw new IllegalStateException("Received Content-Encoding header of gzip, but data is not valid gzip", e);
-                        }
-                    case "deflate":
-                        return new InflaterInputStream(body.byteStream());
-                }
-            }
-            return body.byteStream();
-        }
-
-        public static <T> void handleError(RequestContext<T> context) {
-            Response response = context.getResponse();
-            ResponseBody body = response.body();
-            if(body == null) {
-                context.getErrorConsumer().accept(new RequestException("Unexpected status code " + response.code() + " (No body)", context.getCallStack()));
-                return;
-            }
-            switch(response.code()) {
-                case 403:
-                    context.getErrorConsumer().accept(new RequestException(toJSONObject(response).getString("message"), context.getCallStack()));
-                    break;
-                case 404:
-                    context.getSuccessConsumer().accept(null);
-                    break;
-                default:
-                    JSONObject json = null;
-                    try {
-                        json = toJSONObject(response);
-                    } catch(JSONException ignored) {}
-                    if(json != null) {
-                        context.getErrorConsumer().accept(new RequestException("Unexpected status code " + response.code() + ": " + json.getString("message"), context.getCallStack()));
-                    } else {
-                        context.getErrorConsumer().accept(new RequestException("Unexpected status code " + response.code(), context.getCallStack()));
-                    }
-            }
-        }
-    }
 }
