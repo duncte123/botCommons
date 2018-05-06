@@ -208,7 +208,8 @@ public final class WebUtils extends Reliqua {
         APPLICATION_XML("application/xml"),
         APPLICATION_URLENCODED("application/x-www-form-urlencoded"),
         TEXT_PLAIN("text/plain"),
-        TEXT_HTML("text/html");
+        TEXT_HTML("text/html"),
+        APPLICATION_OCTET_STREAM("application/octet-stream");
 
         private String type;
 
