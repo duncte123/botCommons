@@ -51,6 +51,8 @@ public final class WebUtils extends Reliqua {
         USER_AGENT = userAgent;
     }
 
+    public static String getUserAgent() { return USER_AGENT; }
+
     public PendingRequest<String> getText(String url) {
         return prepareGet(url).build(
                 (response) -> response.body().string(),
