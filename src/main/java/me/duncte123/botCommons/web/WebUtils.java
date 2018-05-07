@@ -231,7 +231,7 @@ public final class WebUtils extends Reliqua {
     public enum Service {
         HASTEBIN("https://hastebin.com/"),
         WASTEBIN("https://wastebin.party/"),
-        LEEKS("https://haste.leeks.life/");
+        LEEKS("https://haste.leeksapp.com/");
 
         private final String url;
 
