@@ -103,6 +103,16 @@ public class Config {
         return this.getInt(key);
     }
 
+    public long getLong(String key) {
+        return config.getLong(key);
+    }
+
+    public long getLong(String key, long defaultValue) {
+        if(!this.hasKey(key))
+            this.put(key, defaultValue);
+        return this.getLong(key);
+    }
+
     /**
      * This will attempt to get a boolean from the config file
      *
