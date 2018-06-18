@@ -45,6 +45,8 @@ public final class WebUtils extends Reliqua {
 
     private WebUtils() {
         super(new OkHttpClient());
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> getClient().connectionPool().evictAll()));
     }
 
     public static void setUserAgent(String userAgent) {
