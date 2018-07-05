@@ -182,29 +182,25 @@ public final class WebUtils extends Reliqua {
         return createRequest(request).build(mapper, WebUtilsErrorUtils::handleError);
     }
 
-    private <T> PendingRequest<T> postRawToService(Service s, String raw, ResponseMapper<T> mapper) {
+    private PendingRequest<String> postRawToService(Service s, String raw) {
         return createRequest(
                 new Request.Builder()
                         .post(RequestBody.create(EncodingType.TEXT_PLAIN.toMediaType(), raw))
-                        .url(s.url + "documents")).build(mapper, WebUtilsErrorUtils::handleError);
+                        .url(s.url + "documents")).build(
+                                (r) -> s.url + new JSONObject(r.body().string()).getString("key") + ".kt"
+                , WebUtilsErrorUtils::handleError);
     }
 
     public PendingRequest<String> leeks(String data) {
-        Service leeks = Service.LEEKS;
-        return postRawToService(leeks, data,
-                (r) -> leeks.url + new JSONObject(r.body().string()).getString("key") + ".kt");
+        return postRawToService( Service.LEEKS, data);
     }
 
     public PendingRequest<String> hastebin(String data) {
-        Service hastebin = Service.HASTEBIN;
-        return postRawToService(hastebin, data,
-                (r) -> hastebin.url + new JSONObject(r.body().string()).getString("key") + ".kt");
+        return postRawToService(Service.HASTEBIN, data);
     }
 
     public PendingRequest<String> wastebin(String data) {
-        Service wastebin = Service.WASTEBIN;
-        return postRawToService(wastebin, data,
-                (r) -> wastebin.url + new JSONObject(r.body().string()).getString("key") + ".kt");
+        return postRawToService(Service.WASTEBIN, data);
     }
 
     public enum EncodingType {
