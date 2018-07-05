@@ -16,15 +16,26 @@
 
 package me.duncte123.botCommons;
 
-import me.duncte123.botCommons.web.WebUtils;
+import me.duncte123.botCommons.config.Config;
+import me.duncte123.botCommons.config.ConfigLoader;
 import org.junit.Test;
 
-public class WebTest {
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
+public class ConfigTest {
 
     @Test
-    public void testWebRequest() {
-        WebUtils.ins.getJSONObject("https://bot.duncte123.me/api/llama/json")
-                .async(json -> System.out.println(json.getString("file")));
-    }
+    public void createConfigAndPut() throws IOException {
+        File configFile = new File("testConfig.json");
 
+        Files.deleteIfExists(configFile.toPath());
+
+        Config config = ConfigLoader.getConfig(configFile);
+
+        config.put("test.value.kaas", "kaas");
+        config.put("test.value.hello", "hello");
+        config.put("test.value2.hello", "hello");
+    }
 }

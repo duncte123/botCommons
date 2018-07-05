@@ -30,9 +30,9 @@ public class ConfigLoader {
      *
      * @param file the file to load
      * @return the loaded config
-     * @throws Exception if something goes wrong
+     * @throws IOException if something goes wrong
      */
-    public static Config getConfig(final File file) throws Exception {
+    public static Config getConfig(final File file) throws IOException {
         if (!file.exists()) {
             file.createNewFile();
             final FileWriter writer = new FileWriter(file);
@@ -46,7 +46,7 @@ public class ConfigLoader {
 
         private final File configFile;
 
-        MainConfig(final File file) throws Exception {
+        MainConfig(final File file) throws IOException {
             super(null, new Ason(Files.asCharSource(file, Charsets.UTF_8).read()));
             this.configFile = file;
         }
