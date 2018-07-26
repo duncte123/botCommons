@@ -36,6 +36,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import static me.duncte123.botCommons.web.WebUtilsErrorUtils.toJSONObject;
+
 
 @SuppressWarnings({"unused", "WeakerAccess", "ConstantConditions"})
 public final class WebUtils extends Reliqua {
@@ -71,7 +73,7 @@ public final class WebUtils extends Reliqua {
 
     public PendingRequest<JSONObject> getJSONObject(String url) {
         return prepareGet(url, EncodingType.APPLICATION_JSON).build(
-                (response) -> new JSONObject(response.body().string()),
+                WebUtilsErrorUtils::toJSONObject,
                 WebUtilsErrorUtils::handleError
         );
     }
@@ -98,11 +100,8 @@ public final class WebUtils extends Reliqua {
     }
 
     public PendingRequestBuilder prepareGet(String url, EncodingType accept) {
-        return createRequest(
-                new Request.Builder()
+        return createRequest(defaultRequest()
                         .url(url)
-                        .get()
-                        .addHeader("User-Agent", USER_AGENT)
                         .addHeader("Accept", accept.getType()));
     }
 
@@ -138,22 +137,17 @@ public final class WebUtils extends Reliqua {
             postParams.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         }
 
-        return createRequest(
-                new Request.Builder()
+        return createRequest(defaultRequest()
                         .url(url)
                         .post(RequestBody.create(EncodingType.APPLICATION_URLENCODED.toMediaType(),
                                 Config.replaceLast(postParams.toString(), "\\&", "")))
-                        .addHeader("User-Agent", USER_AGENT)
-                        .addHeader("Accept", accept.getType())
-                        .addHeader("cache-control", "no-cache"));
+                        .addHeader("Accept", accept.getType()));
     }
 
     public <T> PendingRequest<T> postJSON(String url, JSONObject data, ResponseMapper<T> mapper) {
-        return createRequest(
-                new Request.Builder()
+        return createRequest(defaultRequest()
                         .url(url)
-                        .post(RequestBody.create(EncodingType.APPLICATION_JSON.toMediaType(), data.toString()))
-                        .addHeader("User-Agent", USER_AGENT))
+                        .post(RequestBody.create(EncodingType.APPLICATION_JSON.toMediaType(), data.toString())))
                 .build(
                         mapper,
                         WebUtilsErrorUtils::handleError
@@ -175,7 +169,7 @@ public final class WebUtils extends Reliqua {
                                 .put("dynamicLinkDomain", "g57v2.app.goo.gl").put("link", url))
                         .put("suffix", new JSONObject("{\"option\": \"UNGUESSABLE\"}"))
                 ,
-                (r) -> new JSONObject(r.body().string()).getString("shortLink"));
+                (r) -> toJSONObject(r).getString("shortLink"));
     }
 
     public <T> PendingRequest<T> prepareRaw(Request request, ResponseMapper<T> mapper) {
@@ -183,11 +177,10 @@ public final class WebUtils extends Reliqua {
     }
 
     private PendingRequest<String> postRawToService(Service s, String raw) {
-        return createRequest(
-                new Request.Builder()
+        return createRequest(defaultRequest()
                         .post(RequestBody.create(EncodingType.TEXT_PLAIN.toMediaType(), raw))
                         .url(s.url + "documents")).build(
-                                (r) -> s.url + new JSONObject(r.body().string()).getString("key") + ".kt"
+                                (r) -> s.url + toJSONObject(r).getString("key") + ".kt"
                 , WebUtilsErrorUtils::handleError);
     }
 
@@ -201,6 +194,13 @@ public final class WebUtils extends Reliqua {
 
     public PendingRequest<String> wastebin(String data) {
         return postRawToService(Service.WASTEBIN, data);
+    }
+
+    public static Request.Builder defaultRequest() {
+        return new Request.Builder()
+                .get()
+                .addHeader("User-Agent", USER_AGENT)
+                .addHeader("cache-control", "no-cache");
     }
 
     public enum EncodingType {
