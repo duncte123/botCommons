@@ -36,7 +36,7 @@ public class MessageUtils {
 
     private static Logger logger = LoggerFactory.getLogger(MessageUtils.class);
 
-    private static final Consumer<Throwable> CUSTOM_QUEUE_ERROR = ex -> {
+    public static final Consumer<Throwable> CUSTOM_QUEUE_ERROR = ex -> {
         if (ex instanceof ErrorResponseException) {
             if (((ErrorResponseException) ex).getErrorCode() != 10008) {
                 logger.error("RestAction queue returned failure", ex);
