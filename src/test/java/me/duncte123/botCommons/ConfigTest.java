@@ -16,13 +16,18 @@
 
 package me.duncte123.botCommons;
 
+import junit.framework.TestCase;
 import me.duncte123.botCommons.config.Config;
 import me.duncte123.botCommons.config.ConfigLoader;
+import me.duncte123.botCommons.config.ConfigUtils;
+import me.duncte123.botCommons.obj.TestConfig;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+
+import static junit.framework.TestCase.assertEquals;
 
 public class ConfigTest {
 
@@ -37,5 +42,16 @@ public class ConfigTest {
         config.put("test.value.kaas", "kaas");
         config.put("test.value.hello", "hello");
         config.put("test.value2.hello", "hello");
+    }
+
+    @Test
+    public void testConfigV2() {
+        try {
+            TestConfig config = ConfigUtils.loadFromFile("test.json", TestConfig.class);
+            assertEquals(config.val1, "hello");
+            assertEquals(config.val2, "world");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
