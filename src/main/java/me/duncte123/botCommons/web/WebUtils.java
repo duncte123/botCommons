@@ -21,7 +21,7 @@ import com.github.natanbc.reliqua.Reliqua;
 import com.github.natanbc.reliqua.request.PendingRequest;
 import com.github.natanbc.reliqua.util.PendingRequestBuilder;
 import com.github.natanbc.reliqua.util.ResponseMapper;
-import me.duncte123.botCommons.BuildConfig;
+import me.duncte123.botCommons.CommonsInfo;
 import me.duncte123.botCommons.config.Config;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -43,7 +43,7 @@ import static me.duncte123.botCommons.web.WebUtilsErrorUtils.toJSONObject;
 public final class WebUtils extends Reliqua {
 
     public static final WebUtils ins = new WebUtils();
-    private static String USER_AGENT = "Mozilla/5.0 (compatible; BotCommons/" + BuildConfig.VERSION + "; +https://github.com/duncte123/BotCommons;)";
+    private static String USER_AGENT = "Mozilla/5.0 (compatible; BotCommons/" + CommonsInfo.VERSION + "; +https://github.com/duncte123/BotCommons;)";
 
     private WebUtils() {
         super(new OkHttpClient());
@@ -55,7 +55,9 @@ public final class WebUtils extends Reliqua {
         USER_AGENT = userAgent;
     }
 
-    public static String getUserAgent() { return USER_AGENT; }
+    public static String getUserAgent() {
+        return USER_AGENT;
+    }
 
     public PendingRequest<String> getText(String url) {
         return prepareGet(url).build(
@@ -101,8 +103,8 @@ public final class WebUtils extends Reliqua {
 
     public PendingRequestBuilder prepareGet(String url, EncodingType accept) {
         return createRequest(defaultRequest()
-                        .url(url)
-                        .addHeader("Accept", accept.getType()));
+                .url(url)
+                .addHeader("Accept", accept.getType()));
     }
 
     public PendingRequestBuilder prepareGet(String url) {
@@ -138,16 +140,16 @@ public final class WebUtils extends Reliqua {
         }
 
         return createRequest(defaultRequest()
-                        .url(url)
-                        .post(RequestBody.create(EncodingType.APPLICATION_URLENCODED.toMediaType(),
-                                Config.replaceLast(postParams.toString(), "\\&", "")))
-                        .addHeader("Accept", accept.getType()));
+                .url(url)
+                .post(RequestBody.create(EncodingType.APPLICATION_URLENCODED.toMediaType(),
+                        Config.replaceLast(postParams.toString(), "\\&", "")))
+                .addHeader("Accept", accept.getType()));
     }
 
     public <T> PendingRequest<T> postJSON(String url, JSONObject data, ResponseMapper<T> mapper) {
         return createRequest(defaultRequest()
-                        .url(url)
-                        .post(RequestBody.create(EncodingType.APPLICATION_JSON.toMediaType(), data.toString())))
+                .url(url)
+                .post(RequestBody.create(EncodingType.APPLICATION_JSON.toMediaType(), data.toString())))
                 .build(
                         mapper,
                         WebUtilsErrorUtils::handleError
@@ -178,14 +180,14 @@ public final class WebUtils extends Reliqua {
 
     private PendingRequest<String> postRawToService(Service s, String raw) {
         return createRequest(defaultRequest()
-                        .post(RequestBody.create(EncodingType.TEXT_PLAIN.toMediaType(), raw))
-                        .url(s.url + "documents")).build(
-                                (r) -> s.url + toJSONObject(r).getString("key") + ".kt"
+                .post(RequestBody.create(EncodingType.TEXT_PLAIN.toMediaType(), raw))
+                .url(s.url + "documents")).build(
+                (r) -> s.url + toJSONObject(r).getString("key") + ".kt"
                 , WebUtilsErrorUtils::handleError);
     }
 
     public PendingRequest<String> leeks(String data) {
-        return postRawToService( Service.LEEKS, data);
+        return postRawToService(Service.LEEKS, data);
     }
 
     public PendingRequest<String> hastebin(String data) {
@@ -227,7 +229,7 @@ public final class WebUtils extends Reliqua {
     }
 
     public enum Service {
-//        HASTEBIN("https://hastebin.com/"),
+        //        HASTEBIN("https://hastebin.com/"),
         HASTEBIN("https://hasteb.in/"),
         WASTEBIN("https://wastebin.party/"),
         LEEKS("https://haste.leeksapp.com/");
