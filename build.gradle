@@ -20,7 +20,6 @@ plugins {
     id 'java-library'
     id 'idea'
     id 'maven-publish'
-    id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
 
 group = "me.duncte123"
@@ -58,15 +57,6 @@ javadoc {
     options.author()
     options.encoding = 'UTF-8'
     options.addStringOption('-html5')
-}
-
-buildConfig {
-    appName = project.name
-    version = project.version
-    packageName = project.group + "." + project.archivesBaseName
-    charset = 'UTF-8'
-
-    clsName = 'BuildConfig'
 }
 
 task sourcesForRelease(type: Copy) {
