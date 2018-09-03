@@ -16,24 +16,18 @@
 
 package me.duncte123.botCommons;
 
-import me.duncte123.botCommons.config.ConfigUtils;
-import me.duncte123.botCommons.obj.TestConfig;
-import org.junit.Test;
+public class StringUtils {
 
-import java.io.IOException;
-
-import static junit.framework.TestCase.assertEquals;
-
-public class ConfigTest {
-
-    @Test
-    public void testConfigV2() {
-        try {
-            TestConfig config = ConfigUtils.loadFromFile("test.json", TestConfig.class);
-            assertEquals(config.val1, "hello");
-            assertEquals(config.val2, "world");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Replaces the last thing in a string
+     *
+     * @param text        the text to replace
+     * @param regex       the regex or something
+     * @param replacement what to replace it with
+     * @return the replaced string
+     */
+    public static String replaceLast(String text, String regex, String replacement) {
+        return text.replaceFirst("(?s)(.*)" + regex, "$1" + replacement);
     }
+
 }

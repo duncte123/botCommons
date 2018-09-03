@@ -22,7 +22,7 @@ import com.github.natanbc.reliqua.request.PendingRequest;
 import com.github.natanbc.reliqua.util.PendingRequestBuilder;
 import com.github.natanbc.reliqua.util.ResponseMapper;
 import me.duncte123.botCommons.CommonsInfo;
-import me.duncte123.botCommons.config.Config;
+import me.duncte123.botCommons.StringUtils;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -142,7 +142,7 @@ public final class WebUtils extends Reliqua {
         return createRequest(defaultRequest()
                 .url(url)
                 .post(RequestBody.create(EncodingType.APPLICATION_URLENCODED.toMediaType(),
-                        Config.replaceLast(postParams.toString(), "\\&", "")))
+                        StringUtils.replaceLast(postParams.toString(), "\\&", "")))
                 .addHeader("Accept", accept.getType()));
     }
 
