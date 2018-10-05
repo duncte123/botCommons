@@ -23,6 +23,7 @@ import com.github.natanbc.reliqua.util.PendingRequestBuilder;
 import com.github.natanbc.reliqua.util.ResponseMapper;
 import me.duncte123.botcommons.CommonsInfo;
 import me.duncte123.botcommons.StringUtils;
+import net.dv8tion.jda.core.utils.IOUtil;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -79,17 +80,17 @@ public final class WebUtils extends Reliqua {
         );
     }
 
-    public PendingRequest<Ason> getAson(String url) {
-        return prepareGet(url, EncodingType.APPLICATION_JSON).build(
-                (response) -> new Ason(response.body().string()),
-                WebUtilsErrorUtils::handleError
-        );
-    }
-
     public PendingRequest<InputStream> getInputStream(String url) {
         return prepareGet(url).build(
                 (response) -> response.body().byteStream(),
                 WebUtilsErrorUtils::handleError
+        );
+    }
+
+    public PendingRequest<byte[]> getByteStream(String url) {
+        return prepareGet(url).build(
+            (response) -> IOUtil.readFully(response.body().byteStream()),
+            WebUtilsErrorUtils::handleError
         );
     }
 
