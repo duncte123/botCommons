@@ -21,9 +21,13 @@ public class StringUtils {
     /**
      * Replaces the last thing in a string
      *
-     * @param text        the text to replace
-     * @param regex       the regex or something
-     * @param replacement what to replace it with
+     * @param text
+     *         the text to replace
+     * @param regex
+     *         the regex or something
+     * @param replacement
+     *         what to replace it with
+     *
      * @return the replaced string
      */
     public static String replaceLast(String text, String regex, String replacement) {

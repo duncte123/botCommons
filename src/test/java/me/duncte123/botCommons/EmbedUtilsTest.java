@@ -16,19 +16,25 @@
 
 package me.duncte123.botCommons;
 
-import me.duncte123.botCommons.web.WebUtils;
+import me.duncte123.botCommons.messaging.EmbedUtils;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
-public class WebTest {
+public class EmbedUtilsTest {
 
     @Test
-    public void testAsyncWebRequest() {
-        WebUtils.ins.getJSONObject("https://bot.duncte123.me/api/llama/json")
-                .async(
-                        json -> assertNotNull(json.getString("file"))
-                );
+    public void testCanSetEmbedSupplier() {
+
+        EmbedUtils.setEmbedBuilder(
+                () -> new EmbedBuilder().setAuthor("test")
+        );
+
+        MessageEmbed embed = EmbedUtils.embedMessage("Hello World");
+
+        assertEquals("test", embed.getAuthor().getName());
     }
 
 }

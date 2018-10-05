@@ -51,14 +51,6 @@ public final class WebUtils extends Reliqua {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> getClient().connectionPool().evictAll()));
     }
 
-    public static void setUserAgent(String userAgent) {
-        USER_AGENT = userAgent;
-    }
-
-    public static String getUserAgent() {
-        return USER_AGENT;
-    }
-
     public PendingRequest<String> getText(String url) {
         return prepareGet(url).build(
                 (response) -> response.body().string(),
@@ -196,6 +188,14 @@ public final class WebUtils extends Reliqua {
 
     public PendingRequest<String> wastebin(String data) {
         return postRawToService(Service.WASTEBIN, data);
+    }
+
+    public static String getUserAgent() {
+        return USER_AGENT;
+    }
+
+    public static void setUserAgent(String userAgent) {
+        USER_AGENT = userAgent;
     }
 
     public static Request.Builder defaultRequest() {
