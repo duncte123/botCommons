@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botCommons.text;
+package me.duncte123.botcommons.text;
 
 @SuppressWarnings("unused")
 public class TextColor {

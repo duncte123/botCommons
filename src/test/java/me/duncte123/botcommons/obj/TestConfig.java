@@ -14,27 +14,11 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botCommons;
+package me.duncte123.botcommons.obj;
 
-import me.duncte123.botCommons.messaging.EmbedUtils;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import org.junit.Test;
+public class TestConfig {
 
-import static org.junit.Assert.assertEquals;
-
-public class EmbedUtilsTest {
-
-    @Test
-    public void testCanSetEmbedSupplier() {
-
-        EmbedUtils.setEmbedBuilder(
-                () -> new EmbedBuilder().setAuthor("test")
-        );
-
-        MessageEmbed embed = EmbedUtils.embedMessage("Hello World");
-
-        assertEquals("test", embed.getAuthor().getName());
-    }
+    public String val1;
+    public String val2;
 
 }

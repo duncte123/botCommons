@@ -14,24 +14,27 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botCommons;
+package me.duncte123.botcommons;
 
-public class StringUtils {
+import me.duncte123.botcommons.messaging.EmbedUtils;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+import org.junit.Test;
 
-    /**
-     * Replaces the last thing in a string
-     *
-     * @param text
-     *         the text to replace
-     * @param regex
-     *         the regex or something
-     * @param replacement
-     *         what to replace it with
-     *
-     * @return the replaced string
-     */
-    public static String replaceLast(String text, String regex, String replacement) {
-        return text.replaceFirst("(?s)(.*)" + regex, "$1" + replacement);
+import static org.junit.Assert.assertEquals;
+
+public class EmbedUtilsTest {
+
+    @Test
+    public void testCanSetEmbedSupplier() {
+
+        EmbedUtils.setEmbedBuilder(
+                () -> new EmbedBuilder().setAuthor("test")
+        );
+
+        MessageEmbed embed = EmbedUtils.embedMessage("Hello World");
+
+        assertEquals("test", embed.getAuthor().getName());
     }
 
 }

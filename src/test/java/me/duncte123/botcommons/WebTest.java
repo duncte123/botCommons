@@ -14,10 +14,21 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botCommons;
+package me.duncte123.botcommons;
 
-public class CommonsInfo {
+import me.duncte123.botcommons.web.WebUtils;
+import org.junit.Test;
 
-    public static final String VERSION = "@version@";
+import static org.junit.Assert.assertNotNull;
+
+public class WebTest {
+
+    @Test
+    public void testAsyncWebRequest() {
+        WebUtils.ins.getJSONObject("https://bot.duncte123.me/api/llama/json")
+                .async(
+                        json -> assertNotNull(json.getString("file"))
+                );
+    }
 
 }

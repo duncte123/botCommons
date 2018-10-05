@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botCommons.messaging;
+package me.duncte123.botcommons.messaging;
 
 import net.dv8tion.jda.annotations.ReplaceWith;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import static me.duncte123.botCommons.messaging.EmbedUtils.embedToMessage;
+import static me.duncte123.botcommons.messaging.EmbedUtils.embedToMessage;
 
 public class MessageUtils {
 
@@ -239,7 +239,7 @@ public class MessageUtils {
             if (!channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
                 (new MessageBuilder()).append(embedToMessage(embed))
                         .buildAll(MessageBuilder.SplitPolicy.NEWLINE)
-                        .forEach(it -> me.duncte123.botCommons.messaging.MessageUtils.sendMsg(channel, it, success));
+                        .forEach(it -> me.duncte123.botcommons.messaging.MessageUtils.sendMsg(channel, it, success));
 //                sendMsg(channel, EmbedUtils.embedToMessage(embed));
                 return;
             }

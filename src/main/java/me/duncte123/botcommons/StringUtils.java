@@ -14,21 +14,24 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botCommons;
+package me.duncte123.botcommons;
 
-import me.duncte123.botCommons.web.WebUtils;
-import org.junit.Test;
+public class StringUtils {
 
-import static org.junit.Assert.assertNotNull;
-
-public class WebTest {
-
-    @Test
-    public void testAsyncWebRequest() {
-        WebUtils.ins.getJSONObject("https://bot.duncte123.me/api/llama/json")
-                .async(
-                        json -> assertNotNull(json.getString("file"))
-                );
+    /**
+     * Replaces the last thing in a string
+     *
+     * @param text
+     *         the text to replace
+     * @param regex
+     *         the regex or something
+     * @param replacement
+     *         what to replace it with
+     *
+     * @return the replaced string
+     */
+    public static String replaceLast(String text, String regex, String replacement) {
+        return text.replaceFirst("(?s)(.*)" + regex, "$1" + replacement);
     }
 
 }

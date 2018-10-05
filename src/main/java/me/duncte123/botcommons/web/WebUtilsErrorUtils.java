@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botCommons.web;
+package me.duncte123.botcommons.web;
 
 import com.github.natanbc.reliqua.request.RequestContext;
 import com.github.natanbc.reliqua.request.RequestException;

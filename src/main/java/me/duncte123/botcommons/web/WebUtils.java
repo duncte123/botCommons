@@ -14,15 +14,15 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botCommons.web;
+package me.duncte123.botcommons.web;
 
 import com.afollestad.ason.Ason;
 import com.github.natanbc.reliqua.Reliqua;
 import com.github.natanbc.reliqua.request.PendingRequest;
 import com.github.natanbc.reliqua.util.PendingRequestBuilder;
 import com.github.natanbc.reliqua.util.ResponseMapper;
-import me.duncte123.botCommons.CommonsInfo;
-import me.duncte123.botCommons.StringUtils;
+import me.duncte123.botcommons.CommonsInfo;
+import me.duncte123.botcommons.StringUtils;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -36,7 +36,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import static me.duncte123.botCommons.web.WebUtilsErrorUtils.toJSONObject;
+import static me.duncte123.botcommons.web.WebUtilsErrorUtils.toJSONObject;
 
 
 @SuppressWarnings({"unused", "WeakerAccess", "ConstantConditions"})

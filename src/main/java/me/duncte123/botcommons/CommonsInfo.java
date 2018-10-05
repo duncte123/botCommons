@@ -14,11 +14,10 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botCommons.obj;
+package me.duncte123.botcommons;
 
-public class TestConfig {
+public class CommonsInfo {
 
-    public String val1;
-    public String val2;
+    public static final String VERSION = "@version@";
 
 }

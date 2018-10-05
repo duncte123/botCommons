@@ -14,24 +14,26 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botCommons.config;
+package me.duncte123.botcommons;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import com.google.gson.Gson;
+import me.duncte123.botcommons.config.ConfigUtils;
+import me.duncte123.botcommons.obj.TestConfig;
+import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 
-public class ConfigUtils {
+import static junit.framework.TestCase.assertEquals;
 
-    private static final Gson gson = new Gson();
+public class ConfigTest {
 
-    public static <T> T loadFromFile(String fileName, Class<T> classOfT) throws IOException {
-        return loadFromFile(new File(fileName), classOfT);
-    }
-
-    public static <T> T loadFromFile(File file, Class<T> classOfT) throws IOException {
-        return gson.fromJson(Files.asCharSource(file, Charsets.UTF_8).read(), classOfT);
+    @Test
+    public void testConfigV2() {
+        try {
+            TestConfig config = ConfigUtils.loadFromFile("test.json", TestConfig.class);
+            assertEquals(config.val1, "hello");
+            assertEquals(config.val2, "world");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

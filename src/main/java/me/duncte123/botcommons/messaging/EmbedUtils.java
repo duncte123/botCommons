@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botCommons.messaging;
+package me.duncte123.botcommons.messaging;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
