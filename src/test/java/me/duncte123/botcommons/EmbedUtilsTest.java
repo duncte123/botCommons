@@ -29,12 +29,16 @@ public class EmbedUtilsTest {
     public void testCanSetEmbedSupplier() {
 
         EmbedUtils.setEmbedBuilder(
-                () -> new EmbedBuilder().setAuthor("test")
+            () -> new EmbedBuilder().setAuthor("test")
         );
 
-        MessageEmbed embed = EmbedUtils.embedMessage("Hello World");
+        MessageEmbed embedWithCustomAuthor = EmbedUtils.defaultEmbed()
+            .setAuthor("Kaas").setDescription("Hello world2").build();
 
-        assertEquals("test", embed.getAuthor().getName());
+        MessageEmbed normalEmbed = EmbedUtils.embedMessage("Hello World");
+
+        assertEquals("Kaas", embedWithCustomAuthor.getAuthor().getName());
+        assertEquals("test", normalEmbed.getAuthor().getName());
     }
 
 }
