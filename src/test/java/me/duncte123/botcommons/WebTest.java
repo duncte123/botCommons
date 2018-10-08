@@ -17,11 +17,27 @@
 package me.duncte123.botcommons;
 
 import me.duncte123.botcommons.web.WebUtils;
+import org.json.JSONObject;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class WebTest {
+
+    @Test
+    public void testWebUtilsCanSetUserAgentAndWillSendCorrectUserAgent() {
+
+        String userAgent = "Mozilla/5.0 botCommons test";
+
+        WebUtils.setUserAgent(userAgent);
+
+        assertEquals(userAgent, WebUtils.getUserAgent());
+
+        JSONObject json = WebUtils.ins.getJSONObject("https://apis.duncte123.me/user-agent").execute();
+
+        assertEquals(userAgent, json.getString("user-agent"));
+    }
 
     @Test
     public void testAsyncWebRequest() {
