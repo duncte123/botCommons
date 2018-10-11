@@ -155,16 +155,20 @@ public final class WebUtils extends Reliqua {
         ).execute().getJSONArray(0).getJSONArray(0);
     }
 
-    public PendingRequest<String> shortenUrl(String url, String apiKey) {
+    public PendingRequest<String> shortenUrl(String url, String domain, String apiKey) {
         return postJSON(
                 "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=" +
                         apiKey,
                 new JSONObject()
                         .put("dynamicLinkInfo", new JSONObject()
-                                .put("dynamicLinkDomain", "g57v2.app.goo.gl").put("link", url))
+                                .put("dynamicLinkDomain", domain).put("link", url))
                         .put("suffix", new JSONObject("{\"option\": \"UNGUESSABLE\"}"))
                 ,
                 (r) -> toJSONObject(r).getString("shortLink"));
+    }
+
+    public PendingRequest<String> shortenUrl(String url, String apiKey) {
+        return shortenUrl(url, "g57v2.app.goo.gl", apiKey);
     }
 
     public <T> PendingRequest<T> prepareRaw(Request request, ResponseMapper<T> mapper) {
