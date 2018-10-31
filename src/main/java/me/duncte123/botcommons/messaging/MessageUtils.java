@@ -16,7 +16,9 @@
 
 package me.duncte123.botcommons.messaging;
 
+import gnu.trove.map.TLongIntMap;
 import net.dv8tion.jda.annotations.ReplaceWith;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
@@ -74,7 +76,7 @@ public class MessageUtils {
     public static void sendErrorWithMessage(Message message, String text) {
         sendError(message);
         new MessageBuilder().append(text).buildAll(MessageBuilder.SplitPolicy.NEWLINE).forEach(message1 ->
-                sendMsg(message.getTextChannel(), message1)
+            sendMsg(message.getTextChannel(), message1)
         );
     }
 
@@ -174,7 +176,7 @@ public class MessageUtils {
     public static void sendMsgFormatAndDeleteAfter(TextChannel channel, long delay, TimeUnit unit, String msg, Object... args) {
 
         sendMsg(channel, new MessageBuilder().append(String.format(StringUtils.abbreviate(msg, 2000), args)).build(),
-                it -> it.delete().reason("automatic remove").queueAfter(delay, unit, null, CUSTOM_QUEUE_ERROR)
+            it -> it.delete().reason("automatic remove").queueAfter(delay, unit, null, CUSTOM_QUEUE_ERROR)
         );
     }
 
@@ -235,29 +237,39 @@ public class MessageUtils {
      *         The embed to send
      */
     public static void sendEmbed(TextChannel channel, MessageEmbed embed, Consumer<Message> success) {
-        if (channel != null) {
-            if (!channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
-                (new MessageBuilder()).append(embedToMessage(embed))
-                        .buildAll(MessageBuilder.SplitPolicy.NEWLINE)
-                        .forEach(it -> me.duncte123.botcommons.messaging.MessageUtils.sendMsg(channel, it, success));
-//                sendMsg(channel, EmbedUtils.embedToMessage(embed));
-                return;
-            }
-
-            sendMsg(channel, embed, success);
+        if (channel == null) {
+            return;
         }
+
+        if (!channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
+            (new MessageBuilder()).append(embedToMessage(embed))
+                .buildAll(MessageBuilder.SplitPolicy.NEWLINE)
+                .forEach(it -> MessageUtils.sendMsg(channel, it, success));
+//                sendMsg(channel, EmbedUtils.embedToMessage(embed));
+
+            return;
+        }
+
+        TLongIntMap colors = EmbedUtils.customColors;
+        long guild = channel.getGuild().getIdLong();
+
+        if (colors.containsKey(guild)) {
+            embed = new EmbedBuilder(embed).setColor(colors.get(guild)).build();
+        }
+
+        sendMsg(channel, embed, success);
     }
 
     public static void editMsg(Message message, Message newContent) {
         if (message == null || newContent == null) return;
         if (newContent.getEmbeds().size() > 0) {
             if (!message.getGuild().getSelfMember().hasPermission(message.getTextChannel(),
-                    Permission.MESSAGE_EMBED_LINKS)) {
+                Permission.MESSAGE_EMBED_LINKS)) {
                 MessageBuilder mb = new MessageBuilder()
-                        .append(newContent.getContentRaw())
-                        .append('\n');
+                    .append(newContent.getContentRaw())
+                    .append('\n');
                 newContent.getEmbeds().forEach(
-                        messageEmbed -> mb.append(embedToMessage(messageEmbed))
+                    messageEmbed -> mb.append(embedToMessage(messageEmbed))
                 );
                 message.editMessage(mb.build()).queue();
                 return;
@@ -280,7 +292,7 @@ public class MessageUtils {
     private static void sendMsg(TextChannel channel, MessageEmbed msg, Consumer<Message> success) {
         //Check if the channel exists
         if ((channel != null && channel.getGuild().getTextChannelById(channel.getId()) != null) &&
-                channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ)) {
+            channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ)) {
             Message m = new MessageBuilder().setEmbed(msg).build();
             //Only send a message if we can talk
             channel.sendMessage(m).queue(success, CUSTOM_QUEUE_ERROR);
@@ -470,7 +482,7 @@ public class MessageUtils {
     public static void sendMsg(TextChannel channel, Message msg, Consumer<Message> success, Consumer<Throwable> failure) {
         //Check if the channel exists
         if ((channel != null && channel.getGuild().getTextChannelById(channel.getId()) != null) &&
-                channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ)) {
+            channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ)) {
             //Only send a message if we can talk
             channel.sendMessage(msg).queue(success, failure);
         }

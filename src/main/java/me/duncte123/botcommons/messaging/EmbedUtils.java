@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 
 public class EmbedUtils {
 
-    private static final TLongIntMap customColors = new TLongIntHashMap();
+    static final TLongIntMap customColors = new TLongIntHashMap();
 
     private static Supplier<EmbedBuilder> embedBuilderSupplier = EmbedBuilder::new;
 
