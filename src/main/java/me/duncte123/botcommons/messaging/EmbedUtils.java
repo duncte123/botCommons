@@ -74,6 +74,20 @@ public class EmbedUtils {
     }
 
     /**
+     * The default way to display a nice embedded message
+     *
+     * @param message
+     *         The message to display
+     * @param title
+     *         The title for the embed
+     *
+     * @return The {@link MessageEmbed} to send to the channel
+     */
+    public static MessageEmbed embedMessageWithTitle(String title, String message) {
+        return defaultEmbed().setTitle(title).setDescription(message).build();
+    }
+
+    /**
      * The default way to send a embedded image to the channel
      *
      * @param imageURL
