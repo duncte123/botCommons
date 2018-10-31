@@ -16,17 +16,35 @@
 
 package me.duncte123.botcommons.messaging;
 
+import gnu.trove.map.TLongIntMap;
+import gnu.trove.map.hash.TLongIntHashMap;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.function.Supplier;
 
 public class EmbedUtils {
 
-    private static Supplier<EmbedBuilder> embedBuilderSupplier;
+    private static final TLongIntMap customColors = new TLongIntHashMap();
+
+    private static Supplier<EmbedBuilder> embedBuilderSupplier = EmbedBuilder::new;
 
     public static void setEmbedBuilder(Supplier<EmbedBuilder> embedBuilderSupplier) {
         EmbedUtils.embedBuilderSupplier = embedBuilderSupplier;
+    }
+
+    public static void addColor(long key, @NotNull Color value) {
+        customColors.put(key, value.getRGB());
+    }
+
+    public static void addColor(long key, int value) {
+        customColors.put(key, value);
+    }
+
+    public static void removeColor(long key) {
+        customColors.remove(key);
     }
 
     /**
@@ -80,6 +98,17 @@ public class EmbedUtils {
         return embedBuilderSupplier.get();
     }
 
+    public static EmbedBuilder defaultEmbed(long colorKey) {
+
+        EmbedBuilder builder = embedBuilderSupplier.get();
+
+        if (customColors.containsKey(colorKey)) {
+            builder.setColor(customColors.get(colorKey));
+        }
+
+        return builder;
+    }
+
     /**
      * This will convert our embeds for if the bot is not able to send embeds
      *
@@ -96,15 +125,15 @@ public class EmbedUtils {
         }
         if (embed.getDescription() != null) {
             msg.append("_").append(embed.getDescription()
-                    // Reformat
-                    .replaceAll("\\[(.+)]\\((.+)\\)", "$1 (Link: $2)")
+                // Reformat
+                .replaceAll("\\[(.+)]\\((.+)\\)", "$1 (Link: $2)")
             ).append("_\n\n");
         }
         for (MessageEmbed.Field f : embed.getFields()) {
             msg.append("__").append(f.getName()).append("__\n").append(
-                    f.getValue()
-                            // Reformat
-                            .replaceAll("\\[(.+)]\\((.+)\\)", "$1 (Link: $2)")
+                f.getValue()
+                    // Reformat
+                    .replaceAll("\\[(.+)]\\((.+)\\)", "$1 (Link: $2)")
             ).append("\n\n");
         }
         if (embed.getImage() != null) {

@@ -41,4 +41,15 @@ public class EmbedUtilsTest {
         assertEquals("test", normalEmbed.getAuthor().getName());
     }
 
+
+    @Test
+    public void testCanSetCustomColors() {
+        int color = 0xFF00FF;
+
+        EmbedUtils.addColor(3L, color);
+
+        MessageEmbed embed = EmbedUtils.defaultEmbed(3L).build();
+
+        assertEquals(color, embed.getColorRaw());
+    }
 }
