@@ -220,6 +220,22 @@ public class MessageUtils {
         sendEmbed(event.getChannel(), embed, null);
     }
 
+    public static void sendEmbed(GuildMessageReceivedEvent event, EmbedBuilder embed) {
+        sendEmbed(event.getChannel(), embed);
+    }
+
+    public static void sendEmbed(TextChannel channel, EmbedBuilder embed) {
+
+        TLongIntMap colors = EmbedUtils.customColors;
+        long guild = channel.getGuild().getIdLong();
+
+        if (colors.containsKey(guild)) {
+            embed.setColor(colors.get(guild));
+        }
+
+        sendEmbedRaw(channel, embed.build(), null);
+    }
+
     public static void sendEmbed(GuildMessageReceivedEvent event, MessageEmbed embed, Consumer<Message> success) {
         sendEmbed(event.getChannel(), embed, success);
     }
@@ -241,6 +257,22 @@ public class MessageUtils {
             return;
         }
 
+        TLongIntMap colors = EmbedUtils.customColors;
+        long guild = channel.getGuild().getIdLong();
+
+        if (colors.containsKey(guild)) {
+            embed = new EmbedBuilder(embed).setColor(colors.get(guild)).build();
+        }
+
+        sendEmbedRaw(channel, embed, success);
+
+    }
+
+    public static void sendEmbedRaw(TextChannel channel, MessageEmbed embed, Consumer<Message> success) {
+        if (channel == null) {
+            return;
+        }
+
         if (!channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
             (new MessageBuilder()).append(embedToMessage(embed))
                 .buildAll(MessageBuilder.SplitPolicy.NEWLINE)
@@ -250,12 +282,6 @@ public class MessageUtils {
             return;
         }
 
-        TLongIntMap colors = EmbedUtils.customColors;
-        long guild = channel.getGuild().getIdLong();
-
-        if (colors.containsKey(guild)) {
-            embed = new EmbedBuilder(embed).setColor(colors.get(guild)).build();
-        }
 
         sendMsg(channel, embed, success);
     }
