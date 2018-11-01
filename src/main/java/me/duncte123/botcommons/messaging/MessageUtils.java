@@ -221,10 +221,10 @@ public class MessageUtils {
     }
 
     public static void sendEmbed(GuildMessageReceivedEvent event, EmbedBuilder embed) {
-        sendEmbed(event.getChannel(), embed);
+        sendEmbed(event.getChannel(), embed, null);
     }
 
-    public static void sendEmbed(TextChannel channel, EmbedBuilder embed) {
+    public static void sendEmbed(TextChannel channel, EmbedBuilder embed, Consumer<Message> success) {
 
         TLongIntMap colors = EmbedUtils.customColors;
         long guild = channel.getGuild().getIdLong();
@@ -233,7 +233,7 @@ public class MessageUtils {
             embed.setColor(colors.get(guild));
         }
 
-        sendEmbedRaw(channel, embed.build(), null);
+        sendEmbedRaw(channel, embed.build(), success);
     }
 
     public static void sendEmbed(GuildMessageReceivedEvent event, MessageEmbed embed, Consumer<Message> success) {
