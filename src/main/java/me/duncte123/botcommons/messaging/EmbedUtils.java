@@ -57,8 +57,8 @@ public class EmbedUtils {
      *
      * @return The {@link MessageEmbed} to send to the channel
      */
-    public static MessageEmbed embedField(String title, String message) {
-        return defaultEmbed().addField(title, message, false).build();
+    public static EmbedBuilder embedField(String title, String message) {
+        return defaultEmbed().addField(title, message, false);
     }
 
     /**
@@ -69,8 +69,8 @@ public class EmbedUtils {
      *
      * @return The {@link MessageEmbed} to send to the channel
      */
-    public static MessageEmbed embedMessage(String message) {
-        return defaultEmbed().setDescription(message).build();
+    public static EmbedBuilder embedMessage(String message) {
+        return defaultEmbed().setDescription(message);
     }
 
     /**
@@ -83,8 +83,8 @@ public class EmbedUtils {
      *
      * @return The {@link MessageEmbed} to send to the channel
      */
-    public static MessageEmbed embedMessageWithTitle(String title, String message) {
-        return defaultEmbed().setTitle(title).setDescription(message).build();
+    public static EmbedBuilder embedMessageWithTitle(String title, String message) {
+        return defaultEmbed().setTitle(title).setDescription(message);
     }
 
     /**
@@ -95,12 +95,12 @@ public class EmbedUtils {
      *
      * @return The {@link MessageEmbed} to send to the channel
      */
-    public static MessageEmbed embedImage(String imageURL) {
-        return defaultEmbed().setImage(imageURL).build();
+    public static EmbedBuilder embedImage(String imageURL) {
+        return defaultEmbed().setImage(imageURL);
     }
 
-    public static MessageEmbed embedImageWithTitle(String title, String url, String image) {
-        return defaultEmbed().setTitle(title, url).setImage(image).build();
+    public static EmbedBuilder embedImageWithTitle(String title, String url, String image) {
+        return defaultEmbed().setTitle(title, url).setImage(image);
     }
 
     /**
