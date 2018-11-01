@@ -224,6 +224,10 @@ public class MessageUtils {
         sendEmbed(event.getChannel(), embed, null);
     }
 
+    public static void sendEmbed(TextChannel channel, EmbedBuilder embed) {
+        sendEmbed(channel, embed, null);
+    }
+
     public static void sendEmbed(TextChannel channel, EmbedBuilder embed, Consumer<Message> success) {
 
         TLongIntMap colors = EmbedUtils.customColors;
