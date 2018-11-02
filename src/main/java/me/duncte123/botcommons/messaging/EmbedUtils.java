@@ -47,6 +47,14 @@ public class EmbedUtils {
         customColors.remove(key);
     }
 
+    public static int getColor(long key) {
+        return customColors.get(key);
+    }
+
+    public static int getColorOrDefault(long key, int color) {
+        return customColors.containsKey(key) ? customColors.get(key) : color;
+    }
+
     /**
      * The default way to send a embedded message to the channel with a field in it
      *
