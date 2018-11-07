@@ -230,6 +230,10 @@ public class MessageUtils {
 
     public static void sendEmbed(TextChannel channel, EmbedBuilder embed, Consumer<Message> success) {
 
+        if (channel == null) {
+            return;
+        }
+
         TLongIntMap colors = EmbedUtils.customColors;
         long guild = channel.getGuild().getIdLong();
 
