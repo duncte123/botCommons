@@ -41,7 +41,7 @@ public class WebTest {
 
     @Test
     public void testAsyncWebRequest() {
-        WebUtils.ins.getJSONObject("https://bot.duncte123.me/api/llama/json")
+        WebUtils.ins.getJSONObject("https://apis.duncte123.me/llama")
                 .async(
                         json -> assertNotNull(json.getString("file"))
                 );
