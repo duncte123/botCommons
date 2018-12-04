@@ -23,16 +23,14 @@ import com.github.natanbc.reliqua.util.ResponseMapper;
 import me.duncte123.botcommons.CommonsInfo;
 import me.duncte123.botcommons.StringUtils;
 import net.dv8tion.jda.core.utils.IOUtil;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,43 +44,47 @@ public final class WebUtils extends Reliqua {
     private static String USER_AGENT = "Mozilla/5.0 (compatible; BotCommons/" + CommonsInfo.VERSION + "; +https://github.com/duncte123/BotCommons;)";
 
     private WebUtils() {
-        super(new OkHttpClient());
+        super(
+            new OkHttpClient.Builder()
+                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
+                .build()
+        );
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> getClient().connectionPool().evictAll()));
     }
 
     public PendingRequest<String> getText(String url) {
         return prepareGet(url).build(
-                (response) -> response.body().string(),
-                WebUtilsErrorUtils::handleError
+            (response) -> response.body().string(),
+            WebUtilsErrorUtils::handleError
         );
     }
 
     public PendingRequest<Document> scrapeWebPage(String url) {
         return prepareGet(url, EncodingType.TEXT_HTML).build(
-                (response) -> Jsoup.parse(response.body().string()),
-                WebUtilsErrorUtils::handleError
+            (response) -> Jsoup.parse(response.body().string()),
+            WebUtilsErrorUtils::handleError
         );
     }
 
     public PendingRequest<JSONObject> getJSONObject(String url) {
         return prepareGet(url, EncodingType.APPLICATION_JSON).build(
-                WebUtilsErrorUtils::toJSONObject,
-                WebUtilsErrorUtils::handleError
+            WebUtilsErrorUtils::toJSONObject,
+            WebUtilsErrorUtils::handleError
         );
     }
 
     public PendingRequest<JSONArray> getJSONArray(String url) {
         return prepareGet(url, EncodingType.APPLICATION_JSON).build(
-                (response) -> new JSONArray(response.body().string()),
-                WebUtilsErrorUtils::handleError
+            (response) -> new JSONArray(response.body().string()),
+            WebUtilsErrorUtils::handleError
         );
     }
 
     public PendingRequest<InputStream> getInputStream(String url) {
         return prepareGet(url).build(
-                (response) -> response.body().byteStream(),
-                WebUtilsErrorUtils::handleError
+            (response) -> response.body().byteStream(),
+            WebUtilsErrorUtils::handleError
         );
     }
 
@@ -95,8 +97,8 @@ public final class WebUtils extends Reliqua {
 
     public PendingRequestBuilder prepareGet(String url, EncodingType accept) {
         return createRequest(defaultRequest()
-                .url(url)
-                .addHeader("Accept", accept.getType()));
+            .url(url)
+            .addHeader("Accept", accept.getType()));
     }
 
     public PendingRequestBuilder prepareGet(String url) {
@@ -105,22 +107,22 @@ public final class WebUtils extends Reliqua {
 
     public PendingRequest<String> preparePost(String url, Map<String, Object> postFields) {
         return preparePost(url, postFields, EncodingType.APPLICATION_URLENCODED).build(
-                (response) -> response.body().string(),
-                WebUtilsErrorUtils::handleError
+            (response) -> response.body().string(),
+            WebUtilsErrorUtils::handleError
         );
     }
 
     public PendingRequest<String> preparePost(String url, EncodingType accept) {
         return preparePost(url, new HashMap<>(), accept).build(
-                (response) -> response.body().string(),
-                WebUtilsErrorUtils::handleError
+            (response) -> response.body().string(),
+            WebUtilsErrorUtils::handleError
         );
     }
 
     public PendingRequest<String> preparePost(String url) {
         return preparePost(url, new HashMap<>(), EncodingType.APPLICATION_URLENCODED).build(
-                (response) -> response.body().string(),
-                WebUtilsErrorUtils::handleError
+            (response) -> response.body().string(),
+            WebUtilsErrorUtils::handleError
         );
     }
 
@@ -132,38 +134,38 @@ public final class WebUtils extends Reliqua {
         }
 
         return createRequest(defaultRequest()
-                .url(url)
-                .post(RequestBody.create(EncodingType.APPLICATION_URLENCODED.toMediaType(),
-                        StringUtils.replaceLast(postParams.toString(), "\\&", "")))
-                .addHeader("Accept", accept.getType()));
+            .url(url)
+            .post(RequestBody.create(EncodingType.APPLICATION_URLENCODED.toMediaType(),
+                StringUtils.replaceLast(postParams.toString(), "\\&", "")))
+            .addHeader("Accept", accept.getType()));
     }
 
     public <T> PendingRequest<T> postJSON(String url, JSONObject data, ResponseMapper<T> mapper) {
         return createRequest(defaultRequest()
-                .url(url)
-                .post(RequestBody.create(EncodingType.APPLICATION_JSON.toMediaType(), data.toString())))
-                .build(
-                        mapper,
-                        WebUtilsErrorUtils::handleError
-                );
+            .url(url)
+            .post(RequestBody.create(EncodingType.APPLICATION_JSON.toMediaType(), data.toString())))
+            .build(
+                mapper,
+                WebUtilsErrorUtils::handleError
+            );
     }
 
     public JSONArray translate(String sourceLang, String targetLang, String input) {
         return getJSONArray(
-                "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sourceLang + "&tl=" + targetLang + "&dt=t&q=" + input
+            "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sourceLang + "&tl=" + targetLang + "&dt=t&q=" + input
         ).execute().getJSONArray(0).getJSONArray(0);
     }
 
     public PendingRequest<String> shortenUrl(String url, String domain, String apiKey) {
         return postJSON(
-                "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=" +
-                        apiKey,
-                new JSONObject()
-                        .put("dynamicLinkInfo", new JSONObject()
-                                .put("dynamicLinkDomain", domain).put("link", url))
-                        .put("suffix", new JSONObject("{\"option\": \"UNGUESSABLE\"}"))
-                ,
-                (r) -> toJSONObject(r).getString("shortLink"));
+            "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=" +
+                apiKey,
+            new JSONObject()
+                .put("dynamicLinkInfo", new JSONObject()
+                    .put("dynamicLinkDomain", domain).put("link", url))
+                .put("suffix", new JSONObject("{\"option\": \"UNGUESSABLE\"}"))
+            ,
+            (r) -> toJSONObject(r).getString("shortLink"));
     }
 
     public PendingRequest<String> shortenUrl(String url, String apiKey) {
@@ -176,10 +178,10 @@ public final class WebUtils extends Reliqua {
 
     private PendingRequest<String> postRawToService(Service s, String raw) {
         return createRequest(defaultRequest()
-                .post(RequestBody.create(EncodingType.TEXT_PLAIN.toMediaType(), raw))
-                .url(s.url + "documents")).build(
-                (r) -> s.url + toJSONObject(r).getString("key") + ".kt"
-                , WebUtilsErrorUtils::handleError);
+            .post(RequestBody.create(EncodingType.TEXT_PLAIN.toMediaType(), raw))
+            .url(s.url + "documents")).build(
+            (r) -> s.url + toJSONObject(r).getString("key") + ".kt"
+            , WebUtilsErrorUtils::handleError);
     }
 
     public PendingRequest<String> leeks(String data) {
@@ -204,9 +206,9 @@ public final class WebUtils extends Reliqua {
 
     public static Request.Builder defaultRequest() {
         return new Request.Builder()
-                .get()
-                .addHeader("User-Agent", USER_AGENT)
-                .addHeader("cache-control", "no-cache");
+            .get()
+            .addHeader("User-Agent", USER_AGENT)
+            .addHeader("cache-control", "no-cache");
     }
 
     public enum EncodingType {
