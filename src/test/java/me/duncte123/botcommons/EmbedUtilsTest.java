@@ -19,6 +19,7 @@ package me.duncte123.botcommons;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.Role;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +36,7 @@ public class EmbedUtilsTest {
         MessageEmbed embedWithCustomAuthor = EmbedUtils.defaultEmbed()
             .setAuthor("Kaas").setDescription("Hello world2").build();
 
-        MessageEmbed normalEmbed = EmbedUtils.embedMessage("Hello World");
+        MessageEmbed normalEmbed = EmbedUtils.embedMessage("Hello World").build();
 
         assertEquals("Kaas", embedWithCustomAuthor.getAuthor().getName());
         assertEquals("test", normalEmbed.getAuthor().getName());
@@ -51,5 +52,12 @@ public class EmbedUtilsTest {
         MessageEmbed embed = EmbedUtils.defaultEmbed(3L).build();
 
         assertEquals(color, embed.getColorRaw());
+    }
+
+    @Test
+    public void testEmbedColorDefaultsWhenNotSet() {
+        MessageEmbed embed = EmbedUtils.defaultEmbed(3L).build();
+
+        assertEquals(Role.DEFAULT_COLOR_RAW, embed.getColorRaw());
     }
 }
