@@ -22,7 +22,7 @@ import com.github.natanbc.reliqua.util.PendingRequestBuilder;
 import com.github.natanbc.reliqua.util.ResponseMapper;
 import me.duncte123.botcommons.CommonsInfo;
 import me.duncte123.botcommons.StringUtils;
-import net.dv8tion.jda.core.utils.IOUtil;
+import net.dv8tion.jda.internal.utils.IOUtil;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
