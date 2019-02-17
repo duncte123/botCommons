@@ -63,7 +63,7 @@ dependencies {
         exclude module: 'opus-java'
     }
 
-    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_9') {
+    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_45') {
         exclude module: 'opus-java'
     }
 
