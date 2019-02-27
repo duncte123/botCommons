@@ -503,8 +503,7 @@ public class MessageUtils {
      */
     public static void sendMsg(TextChannel channel, Message msg, Consumer<Message> success, Consumer<Throwable> failure) {
         //Check if the channel exists
-        if ((channel != null && channel.getGuild().getTextChannelById(channel.getId()) != null) &&
-            channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ)) {
+        if ((channel != null && channel.getGuild().getTextChannelById(channel.getId()) != null) && channel.canTalk()) {
             //Only send a message if we can talk
             channel.sendMessage(msg).queue(success, failure);
         }

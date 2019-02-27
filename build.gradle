@@ -59,7 +59,7 @@ dependencies {
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     }
     
-    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '3.8.1_454') {
+    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '3.8.3_460') {
         exclude module: 'opus-java'
     }
 
