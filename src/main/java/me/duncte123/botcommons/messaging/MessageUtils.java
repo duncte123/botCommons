@@ -512,7 +512,7 @@ public class MessageUtils {
             MessageBuilder builder = new MessageBuilder(msg.getContentRaw());
 
             if (!msg.getEmbeds().isEmpty()) {
-                if (!msg.getGuild().getSelfMember().hasPermission(msg.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+                if (!channel.getGuild().getSelfMember().hasPermission(msg.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
                     builder.setEmbed(msg.getEmbeds().get(0));
                 } else {
                     msg.getEmbeds().forEach(
