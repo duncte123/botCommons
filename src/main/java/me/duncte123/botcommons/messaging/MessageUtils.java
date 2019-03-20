@@ -198,6 +198,10 @@ public class MessageUtils {
         sendMsg(channel, (new MessageBuilder().append(String.format(StringUtils.abbreviate(msg, 2000), args)).build()));
     }
 
+    public static void sendMsgFormat(ICommandContext ctx, String msg, Object... args) {
+        sendMsgFormat(ctx.getChannel(), msg, args);
+    }
+
     /**
      * This will check if we can send a embed and convert it to a message if we can't send embeds
      *
@@ -210,7 +214,15 @@ public class MessageUtils {
         sendEmbed(event.getChannel(), embed, null);
     }
 
+    public static void sendEmbed(ICommandContext event, MessageEmbed embed) {
+        sendEmbed(event.getChannel(), embed, null);
+    }
+
     public static void sendEmbed(GuildMessageReceivedEvent event, EmbedBuilder embed) {
+        sendEmbed(event.getChannel(), embed, null);
+    }
+
+    public static void sendEmbed(ICommandContext event, EmbedBuilder embed) {
         sendEmbed(event.getChannel(), embed, null);
     }
 
