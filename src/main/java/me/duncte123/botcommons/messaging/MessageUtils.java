@@ -17,6 +17,7 @@
 package me.duncte123.botcommons.messaging;
 
 import gnu.trove.map.TLongIntMap;
+import me.duncte123.botcommons.commands.ICommandContext;
 import net.dv8tion.jda.annotations.ReplaceWith;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -466,6 +467,48 @@ public class MessageUtils {
      */
     public static void sendMsg(GuildMessageReceivedEvent event, Message msg, Consumer<Message> success, Consumer<Throwable> failure) {
         sendMsg(event.getChannel(), msg, success, failure);
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
+     * @param ctx
+     *         a instance of the {@link ICommandContext CommandContext}
+     * @param msg
+     *         the message to send
+     */
+    public static void sendMsg(ICommandContext ctx, Message msg) {
+        sendMsg(ctx.getChannel(), msg);
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
+     * @param ctx
+     *         a instance of the {@link ICommandContext CommandContext}
+     * @param msg
+     *         the message to send
+     * @param success
+     *         The success consumer
+     */
+    public static void sendMsg(ICommandContext ctx, Message msg, Consumer<Message> success) {
+        sendMsg(ctx.getChannel(), msg, success);
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
+     * @param ctx
+     *         a instance of the {@link ICommandContext CommandContext}
+     * @param msg
+     *         the message to send
+     * @param success
+     *         The success consumer
+     * @param failure
+     *         the failure consumer
+     */
+    public static void sendMsg(ICommandContext ctx, Message msg, Consumer<Message> success, Consumer<Throwable> failure) {
+        sendMsg(ctx.getChannel(), msg, success, failure);
     }
 
     /**
