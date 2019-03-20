@@ -17,9 +17,11 @@
 package me.duncte123.botcommons.messaging;
 
 import gnu.trove.map.TLongIntMap;
+import me.duncte123.botcommons.commands.ICommandContext;
 import net.dv8tion.jda.annotations.ReplaceWith;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.MessageBuilder.SplitPolicy;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
@@ -64,7 +66,7 @@ public class MessageUtils {
      */
     public static void sendErrorWithMessage(Message message, String text) {
         sendError(message);
-        new MessageBuilder().append(text).buildAll(MessageBuilder.SplitPolicy.NEWLINE).forEach(message1 ->
+        new MessageBuilder().append(text).buildAll(SplitPolicy.NEWLINE).forEach(message1 ->
             sendMsg(message.getTextChannel(), message1)
         );
     }
@@ -272,7 +274,7 @@ public class MessageUtils {
 
         if (!channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
             (new MessageBuilder()).append(embedToMessage(embed))
-                .buildAll(MessageBuilder.SplitPolicy.NEWLINE)
+                .buildAll(SplitPolicy.NEWLINE)
                 .forEach(it -> MessageUtils.sendMsg(channel, it, success));
 //                sendMsg(channel, EmbedUtils.embedToMessage(embed));
 
@@ -286,19 +288,23 @@ public class MessageUtils {
     public static void editMsg(Message message, Message newContent) {
         if (message == null || newContent == null) return;
         if (newContent.getEmbeds().size() > 0) {
-            if (!message.getGuild().getSelfMember().hasPermission(message.getTextChannel(),
-                Permission.MESSAGE_EMBED_LINKS)) {
+            if (!message.getGuild().getSelfMember().hasPermission(message.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+
                 MessageBuilder mb = new MessageBuilder()
                     .append(newContent.getContentRaw())
                     .append('\n');
+
                 newContent.getEmbeds().forEach(
                     messageEmbed -> mb.append(embedToMessage(messageEmbed))
                 );
+
                 message.editMessage(mb.build()).queue();
+
                 return;
             }
-            message.editMessage(newContent).queue();
         }
+
+        message.editMessage(newContent).queue();
     }
 
     /**
@@ -467,6 +473,48 @@ public class MessageUtils {
     /**
      * This is a shortcut for sending messages to a channel
      *
+     * @param ctx
+     *         a instance of the {@link ICommandContext CommandContext}
+     * @param msg
+     *         the message to send
+     */
+    public static void sendMsg(ICommandContext ctx, Message msg) {
+        sendMsg(ctx.getChannel(), msg);
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
+     * @param ctx
+     *         a instance of the {@link ICommandContext CommandContext}
+     * @param msg
+     *         the message to send
+     * @param success
+     *         The success consumer
+     */
+    public static void sendMsg(ICommandContext ctx, Message msg, Consumer<Message> success) {
+        sendMsg(ctx.getChannel(), msg, success);
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
+     * @param ctx
+     *         a instance of the {@link ICommandContext CommandContext}
+     * @param msg
+     *         the message to send
+     * @param success
+     *         The success consumer
+     * @param failure
+     *         the failure consumer
+     */
+    public static void sendMsg(ICommandContext ctx, Message msg, Consumer<Message> success, Consumer<Throwable> failure) {
+        sendMsg(ctx.getChannel(), msg, success, failure);
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
      * @param channel
      *         he {@link TextChannel TextChannel} that we want to send our message to
      * @param msg
@@ -503,10 +551,23 @@ public class MessageUtils {
      *         the failure consumer
      */
     public static void sendMsg(TextChannel channel, Message msg, Consumer<Message> success, Consumer<Throwable> failure) {
-        //Check if the channel exists
+        //Check if the channel exists and we can talk
         if ((channel != null && channel.getGuild().getTextChannelById(channel.getId()) != null) && channel.canTalk()) {
-            //Only send a message if we can talk
-            channel.sendMessage(msg).queue(success, failure);
+            MessageBuilder builder = new MessageBuilder(msg.getContentRaw());
+
+            if (!msg.getEmbeds().isEmpty()) {
+                if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
+                    builder.setEmbed(msg.getEmbeds().get(0));
+                } else {
+                    msg.getEmbeds().forEach(
+                        messageEmbed -> builder.append(embedToMessage(messageEmbed))
+                    );
+                }
+            }
+
+            builder.buildAll(SplitPolicy.SPACE, SplitPolicy.NEWLINE).forEach(
+                (message) -> channel.sendMessage(message).queue(success, failure)
+            );
         }
     }
 }
