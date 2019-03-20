@@ -384,6 +384,48 @@ public class MessageUtils {
     /**
      * This is a shortcut for sending messages to a channel
      *
+     * @param ctx
+     *         a instance of {@link GuildMessageReceivedEvent GuildMessageReceivedEvent}
+     * @param msg
+     *         the message to send
+     */
+    public static void sendMsg(ICommandContext ctx, String msg) {
+        sendMsg(ctx.getChannel(), (new MessageBuilder()).append(StringUtils.abbreviate(msg, 2000)).build());
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
+     * @param ctx
+     *         a instance of {@link GuildMessageReceivedEvent GuildMessageReceivedEvent}
+     * @param msg
+     *         the message to send
+     * @param success
+     *         The success consumer
+     */
+    public static void sendMsg(ICommandContext ctx, String msg, Consumer<Message> success) {
+        sendMsg(ctx.getChannel(), (new MessageBuilder()).append(StringUtils.abbreviate(msg, 2000)).build(), success);
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
+     * @param ctx
+     *         a instance of {@link GuildMessageReceivedEvent GuildMessageReceivedEvent}
+     * @param msg
+     *         the message to send
+     * @param success
+     *         The success consumer
+     * @param failure
+     *         the failure consumer
+     */
+    public static void sendMsg(ICommandContext ctx, String msg, Consumer<Message> success, Consumer<Throwable> failure) {
+        sendMsg(ctx.getChannel(), (new MessageBuilder()).append(StringUtils.abbreviate(msg, 2000)).build(), success, failure);
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
      * @param channel
      *         he {@link TextChannel TextChannel} that we want to send our message to
      * @param msg
