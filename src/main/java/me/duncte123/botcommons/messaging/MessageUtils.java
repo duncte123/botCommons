@@ -199,6 +199,10 @@ public class MessageUtils {
         sendMsg(channel, (new MessageBuilder().append(String.format(StringUtils.abbreviate(msg, 2000), args)).build()));
     }
 
+    public static void sendMsgFormat(ICommandContext ctx, String msg, Object... args) {
+        sendMsgFormat(ctx.getChannel(), msg, args);
+    }
+
     /**
      * This will check if we can send a embed and convert it to a message if we can't send embeds
      *
@@ -211,7 +215,15 @@ public class MessageUtils {
         sendEmbed(event.getChannel(), embed, null);
     }
 
+    public static void sendEmbed(ICommandContext event, MessageEmbed embed) {
+        sendEmbed(event.getChannel(), embed, null);
+    }
+
     public static void sendEmbed(GuildMessageReceivedEvent event, EmbedBuilder embed) {
+        sendEmbed(event.getChannel(), embed, null);
+    }
+
+    public static void sendEmbed(ICommandContext event, EmbedBuilder embed) {
         sendEmbed(event.getChannel(), embed, null);
     }
 
@@ -368,6 +380,48 @@ public class MessageUtils {
      */
     public static void sendMsg(GuildMessageReceivedEvent event, String msg, Consumer<Message> success, Consumer<Throwable> failure) {
         sendMsg(event.getChannel(), (new MessageBuilder()).append(StringUtils.abbreviate(msg, 2000)).build(), success, failure);
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
+     * @param ctx
+     *         a instance of {@link GuildMessageReceivedEvent GuildMessageReceivedEvent}
+     * @param msg
+     *         the message to send
+     */
+    public static void sendMsg(ICommandContext ctx, String msg) {
+        sendMsg(ctx.getChannel(), (new MessageBuilder()).append(StringUtils.abbreviate(msg, 2000)).build());
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
+     * @param ctx
+     *         a instance of {@link GuildMessageReceivedEvent GuildMessageReceivedEvent}
+     * @param msg
+     *         the message to send
+     * @param success
+     *         The success consumer
+     */
+    public static void sendMsg(ICommandContext ctx, String msg, Consumer<Message> success) {
+        sendMsg(ctx.getChannel(), (new MessageBuilder()).append(StringUtils.abbreviate(msg, 2000)).build(), success);
+    }
+
+    /**
+     * This is a shortcut for sending messages to a channel
+     *
+     * @param ctx
+     *         a instance of {@link GuildMessageReceivedEvent GuildMessageReceivedEvent}
+     * @param msg
+     *         the message to send
+     * @param success
+     *         The success consumer
+     * @param failure
+     *         the failure consumer
+     */
+    public static void sendMsg(ICommandContext ctx, String msg, Consumer<Message> success, Consumer<Throwable> failure) {
+        sendMsg(ctx.getChannel(), (new MessageBuilder()).append(StringUtils.abbreviate(msg, 2000)).build(), success, failure);
     }
 
     /**
