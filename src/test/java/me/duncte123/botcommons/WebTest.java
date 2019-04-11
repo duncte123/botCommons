@@ -36,14 +36,14 @@ public class WebTest {
 
         JSONObject json = WebUtils.ins.getJSONObject("https://apis.duncte123.me/user-agent").execute();
 
-        assertEquals(userAgent, json.getString("user-agent"));
+        assertEquals(userAgent, json.getJSONObject("data").getString("user-agent"));
     }
 
     @Test
     public void testAsyncWebRequest() {
         WebUtils.ins.getJSONObject("https://apis.duncte123.me/llama")
                 .async(
-                        json -> assertNotNull(json.getString("file"))
+                        json -> assertNotNull(json.getJSONObject("data").getString("file"))
                 );
     }
 
