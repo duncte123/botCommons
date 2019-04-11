@@ -16,22 +16,18 @@
 
 package me.duncte123.botcommons.config;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
 
 public class ConfigUtils {
 
-    private static final Gson gson = new Gson();
-
     public static <T> T loadFromFile(String fileName, Class<T> classOfT) throws IOException {
         return loadFromFile(new File(fileName), classOfT);
     }
 
     public static <T> T loadFromFile(File file, Class<T> classOfT) throws IOException {
-        return gson.fromJson(Files.asCharSource(file, Charsets.UTF_8).read(), classOfT);
+        return new ObjectMapper().readValue(file, classOfT);
     }
 }
