@@ -184,10 +184,6 @@ public final class WebUtils extends Reliqua {
             , WebUtilsErrorUtils::handleError);
     }
 
-    public PendingRequest<String> leeks(String data) {
-        return postRawToService(Service.LEEKS, data);
-    }
-
     public PendingRequest<String> hastebin(String data) {
         return postRawToService(Service.HASTEBIN, data);
     }
@@ -237,8 +233,7 @@ public final class WebUtils extends Reliqua {
     public enum Service {
         //        HASTEBIN("https://hastebin.com/"),
         HASTEBIN("https://hasteb.in/"),
-        WASTEBIN("https://wastebin.party/"),
-        LEEKS("https://haste.leeksapp.com/");
+        WASTEBIN("https://wastebin.party/");
 
         private final String url;
 
