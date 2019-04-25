@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static me.duncte123.botcommons.web.WebUtilsErrorUtils.toJSONObject;
 
@@ -47,6 +48,9 @@ public final class WebUtils extends Reliqua {
         super(
             new OkHttpClient.Builder()
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
+                .connectTimeout(30L, TimeUnit.SECONDS)
+                .readTimeout(30L, TimeUnit.SECONDS)
+                .writeTimeout(30L, TimeUnit.SECONDS)
                 .build()
         );
 
