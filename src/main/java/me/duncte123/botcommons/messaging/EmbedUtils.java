@@ -25,32 +25,80 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.util.function.Supplier;
 
+/**
+ * Util class to help send embeds
+ */
 public class EmbedUtils {
 
+    private static Supplier<EmbedBuilder> embedBuilderSupplier = EmbedBuilder::new;
     static final TLongIntMap customColors = new TLongIntHashMap();
 
-    private static Supplier<EmbedBuilder> embedBuilderSupplier = EmbedBuilder::new;
-
+    /**
+     * Sets the embed builder for the util method
+     *
+     * @param embedBuilderSupplier
+     *         the default embed layout
+     */
     public static void setEmbedBuilder(Supplier<EmbedBuilder> embedBuilderSupplier) {
         EmbedUtils.embedBuilderSupplier = embedBuilderSupplier;
     }
 
+    /**
+     * Adds a color for a guild id
+     *
+     * @param key
+     *         the guild id
+     * @param value
+     *         the color for this guild
+     */
     public static void addColor(long key, @NotNull Color value) {
         customColors.put(key, value.getRGB());
     }
 
+    /**
+     * Adds a color for a guild id
+     *
+     * @param key
+     *         the guild id
+     * @param value
+     *         the color for this guild
+     */
     public static void addColor(long key, int value) {
         customColors.put(key, value);
     }
 
+    /**
+     * Removes a color for a guild id
+     *
+     * @param key
+     *         the id to remove the color for
+     */
     public static void removeColor(long key) {
         customColors.remove(key);
     }
 
+    /**
+     * Gets a color for an id
+     *
+     * @param key
+     *         the id to find the color for
+     *
+     * @return The color for this key or "0"
+     */
     public static int getColor(long key) {
         return customColors.get(key);
     }
 
+    /**
+     * Gets a color for an id
+     *
+     * @param key
+     *         the id to find the color for
+     * @param color
+     *         the default value for the key
+     *
+     * @return The color for this key or the default value
+     */
     public static int getColorOrDefault(long key, int color) {
         return customColors.containsKey(key) ? customColors.get(key) : color;
     }
@@ -63,7 +111,7 @@ public class EmbedUtils {
      * @param message
      *         The message to display
      *
-     * @return The {@link MessageEmbed} to send to the channel
+     * @return The {@link EmbedBuilder} for this action
      */
     public static EmbedBuilder embedField(String title, String message) {
         return defaultEmbed().addField(title, message, false);
@@ -75,7 +123,7 @@ public class EmbedUtils {
      * @param message
      *         The message to display
      *
-     * @return The {@link MessageEmbed} to send to the channel
+     * @return The {@link EmbedBuilder} for this action
      */
     public static EmbedBuilder embedMessage(String message) {
         return defaultEmbed().setDescription(message);
@@ -89,7 +137,7 @@ public class EmbedUtils {
      * @param title
      *         The title for the embed
      *
-     * @return The {@link MessageEmbed} to send to the channel
+     * @return The {@link EmbedBuilder} for this action
      */
     public static EmbedBuilder embedMessageWithTitle(String title, String message) {
         return defaultEmbed().setTitle(title).setDescription(message);
@@ -101,7 +149,7 @@ public class EmbedUtils {
      * @param imageURL
      *         The url from the image
      *
-     * @return The {@link MessageEmbed} to send to the channel
+     * @return The {@link EmbedBuilder} for this action
      */
     public static EmbedBuilder embedImage(String imageURL) {
         return defaultEmbed().setImage(imageURL);
@@ -112,17 +160,16 @@ public class EmbedUtils {
     }
 
     /**
-     * The default embed layout that all of the embeds are based off
+     * Returns the default {@link EmbedBuilder embed} set in {@link #setEmbedBuilder(Supplier)}
      *
-     * @return The way that that the {@link EmbedBuilder embed} will look like
+     * @return The default {@link EmbedBuilder embed} set in {@link #setEmbedBuilder(Supplier)}
      */
     public static EmbedBuilder defaultEmbed() {
         return embedBuilderSupplier.get();
     }
 
     public static EmbedBuilder defaultEmbed(long colorKey) {
-
-        EmbedBuilder builder = embedBuilderSupplier.get();
+        final EmbedBuilder builder = embedBuilderSupplier.get();
 
         if (customColors.containsKey(colorKey)) {
             builder.setColor(customColors.get(colorKey));
@@ -140,17 +187,19 @@ public class EmbedUtils {
      * @return the converted embed
      */
     static String embedToMessage(MessageEmbed embed) {
-        StringBuilder msg = new StringBuilder();
+        final StringBuilder msg = new StringBuilder();
 
         if (embed.getAuthor() != null) {
             msg.append("***").append(embed.getAuthor().getName()).append("***\n\n");
         }
+
         if (embed.getDescription() != null) {
             msg.append("_").append(embed.getDescription()
                 // Reformat
                 .replaceAll("\\[(.+)]\\((.+)\\)", "$1 (Link: $2)")
             ).append("_\n\n");
         }
+
         for (MessageEmbed.Field f : embed.getFields()) {
             msg.append("__").append(f.getName()).append("__\n").append(
                 f.getValue()
@@ -158,12 +207,15 @@ public class EmbedUtils {
                     .replaceAll("\\[(.+)]\\((.+)\\)", "$1 (Link: $2)")
             ).append("\n\n");
         }
+
         if (embed.getImage() != null) {
             msg.append(embed.getImage().getUrl()).append("\n");
         }
+
         if (embed.getFooter() != null) {
             msg.append(embed.getFooter().getText());
         }
+
         if (embed.getTimestamp() != null) {
             msg.append(" | ").append(embed.getTimestamp());
         }

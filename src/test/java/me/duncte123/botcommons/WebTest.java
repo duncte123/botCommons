@@ -17,6 +17,9 @@
 package me.duncte123.botcommons;
 
 import me.duncte123.botcommons.web.WebUtils;
+import okhttp3.HttpUrl;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -27,21 +30,36 @@ public class WebTest {
 
     @Test
     public void testWebUtilsCanSetUserAgentAndWillSendCorrectUserAgent() {
-
         String userAgent = "Mozilla/5.0 botCommons test";
+
+        MockWebServer server = new MockWebServer();
+        server.enqueue(new MockResponse()
+            .addHeader("Content-Type", "application/json; charset=utf-8")
+            .setBody(new JSONObject().put("data", new JSONObject().put("user-agent", userAgent)).toString())
+        );
 
         WebUtils.setUserAgent(userAgent);
 
         assertEquals(userAgent, WebUtils.getUserAgent());
 
-        JSONObject json = WebUtils.ins.getJSONObject("https://apis.duncte123.me/user-agent").execute();
+        HttpUrl baseUrl = server.url("/user-agent");
+
+        JSONObject json = WebUtils.ins.getJSONObject(baseUrl.toString()).execute();
 
         assertEquals(userAgent, json.getJSONObject("data").getString("user-agent"));
     }
 
     @Test
     public void testAsyncWebRequest() {
-        WebUtils.ins.getJSONObject("https://apis.duncte123.me/llama")
+        MockWebServer server = new MockWebServer();
+        server.enqueue(new MockResponse()
+            .addHeader("Content-Type", "application/json; charset=utf-8")
+            .setBody(new JSONObject().put("data", new JSONObject().put("file", "Hi there")).toString())
+        );
+
+        HttpUrl baseUrl = server.url("/llama");
+
+        WebUtils.ins.getJSONObject(baseUrl.toString())
                 .async(
                         json -> assertNotNull(json.getJSONObject("data").getString("file"))
                 );

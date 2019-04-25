@@ -36,9 +36,14 @@ public class WebUtilsErrorUtils {
     }
 
     public static InputStream getInputStream(Response response) {
-        ResponseBody body = response.body();
-        if (body == null) throw new IllegalStateException("Body should never be null");
-        String encoding = response.header("Content-Encoding");
+        final ResponseBody body = response.body();
+
+        if (body == null) {
+            throw new IllegalStateException("Body should never be null");
+        }
+
+        final String encoding = response.header("Content-Encoding");
+
         if (encoding != null) {
             switch (encoding.toLowerCase()) {
                 case "gzip":
@@ -51,16 +56,19 @@ public class WebUtilsErrorUtils {
                     return new InflaterInputStream(body.byteStream());
             }
         }
+
         return body.byteStream();
     }
 
     public static <T> void handleError(RequestContext<T> context) {
-        Response response = context.getResponse();
-        ResponseBody body = response.body();
+        final Response response = context.getResponse();
+        final ResponseBody body = response.body();
+
         if (body == null) {
             context.getErrorConsumer().accept(new RequestException("Unexpected status code " + response.code() + " (No body)", context.getCallStack()));
             return;
         }
+
         switch (response.code()) {
             case 403:
                 context.getErrorConsumer().accept(new RequestException(toJSONObject(response).getString("message"), context.getCallStack()));
@@ -70,10 +78,11 @@ public class WebUtilsErrorUtils {
                 break;
             default:
                 JSONObject json = null;
+
                 try {
                     json = toJSONObject(response);
-                } catch (JSONException ignored) {
-                }
+                } catch (JSONException ignored) { }
+
                 if (json != null) {
                     context.getErrorConsumer().accept(new RequestException("Unexpected status code " + response.code() + ": " + json.getString("message"), context.getCallStack()));
                 } else {
