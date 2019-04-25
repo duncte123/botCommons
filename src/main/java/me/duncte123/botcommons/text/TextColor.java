@@ -16,6 +16,9 @@
 
 package me.duncte123.botcommons.text;
 
+/**
+ * Class that holds color values that can be printed in terminals
+ */
 @SuppressWarnings("unused")
 public class TextColor {
 
