@@ -30,6 +30,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -605,8 +606,9 @@ public class MessageUtils {
      */
     public static void sendMsg(TextChannel channel, Message msg, Consumer<Message> success, Consumer<Throwable> failure) {
         //Check if the channel exists and we can talk
-        if ((channel != null && channel.getGuild().getTextChannelById(channel.getId()) != null) && channel.canTalk()) {
-            MessageBuilder builder = new MessageBuilder(msg.getContentRaw());
+        if ((channel != null && channel.getGuild().getTextChannelById(channel.getId()) != null) &&
+            Objects.requireNonNull(channel.getGuild().getTextChannelById(channel.getId())).canTalk()) {
+            final MessageBuilder builder = new MessageBuilder(msg.getContentRaw());
 
             if (!msg.getEmbeds().isEmpty()) {
                 if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
