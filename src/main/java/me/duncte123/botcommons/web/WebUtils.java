@@ -145,9 +145,13 @@ public final class WebUtils extends Reliqua {
     }
 
     public <T> PendingRequest<T> postJSON(String url, JSONObject data, ResponseMapper<T> mapper) {
+        return postJSON(url, data.toString(), mapper);
+    }
+
+    public <T> PendingRequest<T> postJSON(String url, String data, ResponseMapper<T> mapper) {
         return createRequest(defaultRequest()
             .url(url)
-            .post(RequestBody.create(EncodingType.APPLICATION_JSON.toMediaType(), data.toString())))
+            .post(RequestBody.create(EncodingType.APPLICATION_JSON.toMediaType(), data)))
             .build(
                 mapper,
                 WebUtilsErrorUtils::handleError
