@@ -30,7 +30,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 @SuppressWarnings("WeakerAccess")
-public class WebUtilsErrorUtils {
+public class WebParserUtils {
     public static JSONObject toJSONObject(Response response) {
         return new JSONObject(new JSONTokener(getInputStream(response)));
     }
@@ -69,25 +69,16 @@ public class WebUtilsErrorUtils {
             return;
         }
 
-        switch (response.code()) {
-            case 403:
-                context.getErrorConsumer().accept(new RequestException(toJSONObject(response).getString("message"), context.getCallStack()));
-                break;
-            case 404:
-                context.getSuccessConsumer().accept(null);
-                break;
-            default:
-                JSONObject json = null;
+        JSONObject json = null;
 
-                try {
-                    json = toJSONObject(response);
-                } catch (JSONException ignored) { }
+        try {
+            json = toJSONObject(response);
+        } catch (JSONException ignored) { }
 
-                if (json != null) {
-                    context.getErrorConsumer().accept(new RequestException("Unexpected status code " + response.code() + ": " + json.getString("message"), context.getCallStack()));
-                } else {
-                    context.getErrorConsumer().accept(new RequestException("Unexpected status code " + response.code(), context.getCallStack()));
-                }
+        if (json != null) {
+            context.getErrorConsumer().accept(new RequestException("Unexpected status code " + response.code() + ": " + json, context.getCallStack()));
+        } else {
+            context.getErrorConsumer().accept(new RequestException("Unexpected status code " + response.code(), context.getCallStack()));
         }
     }
 }

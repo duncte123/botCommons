@@ -23,19 +23,21 @@ import com.github.natanbc.reliqua.util.ResponseMapper;
 import me.duncte123.botcommons.CommonsInfo;
 import me.duncte123.botcommons.StringUtils;
 import net.dv8tion.jda.core.utils.IOUtil;
-import okhttp3.*;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static me.duncte123.botcommons.web.WebUtilsErrorUtils.toJSONObject;
+import static me.duncte123.botcommons.web.WebParserUtils.toJSONObject;
 
 
 @SuppressWarnings({"unused", "WeakerAccess", "ConstantConditions"})
@@ -47,55 +49,52 @@ public final class WebUtils extends Reliqua {
     private WebUtils() {
         super(
             new OkHttpClient.Builder()
-                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
                 .connectTimeout(30L, TimeUnit.SECONDS)
                 .readTimeout(30L, TimeUnit.SECONDS)
                 .writeTimeout(30L, TimeUnit.SECONDS)
                 .build()
         );
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> getClient().connectionPool().evictAll()));
     }
 
     public PendingRequest<String> getText(String url) {
         return prepareGet(url).build(
             (response) -> response.body().string(),
-            WebUtilsErrorUtils::handleError
+            WebParserUtils::handleError
         );
     }
 
     public PendingRequest<Document> scrapeWebPage(String url) {
         return prepareGet(url, EncodingType.TEXT_HTML).build(
             (response) -> Jsoup.parse(response.body().string()),
-            WebUtilsErrorUtils::handleError
+            WebParserUtils::handleError
         );
     }
 
     public PendingRequest<JSONObject> getJSONObject(String url) {
         return prepareGet(url, EncodingType.APPLICATION_JSON).build(
-            WebUtilsErrorUtils::toJSONObject,
-            WebUtilsErrorUtils::handleError
+            WebParserUtils::toJSONObject,
+            WebParserUtils::handleError
         );
     }
 
     public PendingRequest<JSONArray> getJSONArray(String url) {
         return prepareGet(url, EncodingType.APPLICATION_JSON).build(
             (response) -> new JSONArray(response.body().string()),
-            WebUtilsErrorUtils::handleError
+            WebParserUtils::handleError
         );
     }
 
     public PendingRequest<InputStream> getInputStream(String url) {
         return prepareGet(url).build(
             (response) -> response.body().byteStream(),
-            WebUtilsErrorUtils::handleError
+            WebParserUtils::handleError
         );
     }
 
     public PendingRequest<byte[]> getByteStream(String url) {
         return prepareGet(url).build(
             (response) -> IOUtil.readFully(response.body().byteStream()),
-            WebUtilsErrorUtils::handleError
+            WebParserUtils::handleError
         );
     }
 
@@ -112,35 +111,39 @@ public final class WebUtils extends Reliqua {
     public PendingRequest<String> preparePost(String url, Map<String, Object> postFields) {
         return preparePost(url, postFields, EncodingType.APPLICATION_URLENCODED).build(
             (response) -> response.body().string(),
-            WebUtilsErrorUtils::handleError
+            WebParserUtils::handleError
         );
     }
 
     public PendingRequest<String> preparePost(String url, EncodingType accept) {
         return preparePost(url, new HashMap<>(), accept).build(
             (response) -> response.body().string(),
-            WebUtilsErrorUtils::handleError
+            WebParserUtils::handleError
         );
     }
 
     public PendingRequest<String> preparePost(String url) {
         return preparePost(url, new HashMap<>(), EncodingType.APPLICATION_URLENCODED).build(
             (response) -> response.body().string(),
-            WebUtilsErrorUtils::handleError
+            WebParserUtils::handleError
         );
     }
 
     public PendingRequestBuilder preparePost(String url, Map<String, Object> postFields, EncodingType accept) {
-        StringBuilder postParams = new StringBuilder();
+        final StringBuilder postParams = new StringBuilder();
 
-        for (Map.Entry<String, Object> entry : postFields.entrySet()) {
+        for (final Map.Entry<String, Object> entry : postFields.entrySet()) {
             postParams.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         }
 
         return createRequest(defaultRequest()
             .url(url)
-            .post(RequestBody.create(EncodingType.APPLICATION_URLENCODED.toMediaType(),
-                StringUtils.replaceLast(postParams.toString(), "\\&", "")))
+            .post(
+                RequestBody.create(
+                    EncodingType.APPLICATION_URLENCODED.toMediaType(),
+                    StringUtils.replaceLast(postParams.toString(), "\\&", "")
+                )
+            )
             .addHeader("Accept", accept.getType()));
     }
 
@@ -154,14 +157,17 @@ public final class WebUtils extends Reliqua {
             .post(RequestBody.create(EncodingType.APPLICATION_JSON.toMediaType(), data)))
             .build(
                 mapper,
-                WebUtilsErrorUtils::handleError
+                WebParserUtils::handleError
             );
     }
 
     public JSONArray translate(String sourceLang, String targetLang, String input) {
         return getJSONArray(
             "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sourceLang + "&tl=" + targetLang + "&dt=t&q=" + input
-        ).execute().getJSONArray(0).getJSONArray(0);
+        )
+            .execute()
+            .getJSONArray(0)
+            .getJSONArray(0);
     }
 
     public PendingRequest<String> shortenUrl(String url, String domain, String apiKey) {
@@ -169,35 +175,20 @@ public final class WebUtils extends Reliqua {
             "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=" +
                 apiKey,
             new JSONObject()
-                .put("dynamicLinkInfo", new JSONObject()
-                    .put("dynamicLinkDomain", domain).put("link", url))
-                .put("suffix", new JSONObject("{\"option\": \"UNGUESSABLE\"}"))
+                .put("dynamicLinkInfo",
+                    new JSONObject().put("domainUriPrefix", domain).put("link", url)
+                )
+                .put("suffix", new JSONObject().put("option", "SHORT"))
             ,
             (r) -> toJSONObject(r).getString("shortLink"));
     }
 
     public PendingRequest<String> shortenUrl(String url, String apiKey) {
-        return shortenUrl(url, "g57v2.app.goo.gl", apiKey);
+        return shortenUrl(url, "dunctebot.page.link", apiKey);
     }
 
     public <T> PendingRequest<T> prepareRaw(Request request, ResponseMapper<T> mapper) {
-        return createRequest(request).build(mapper, WebUtilsErrorUtils::handleError);
-    }
-
-    private PendingRequest<String> postRawToService(Service s, String raw) {
-        return createRequest(defaultRequest()
-            .post(RequestBody.create(EncodingType.TEXT_PLAIN.toMediaType(), raw))
-            .url(s.url + "documents")).build(
-            (r) -> s.url + toJSONObject(r).getString("key") + ".kt"
-            , WebUtilsErrorUtils::handleError);
-    }
-
-    public PendingRequest<String> hastebin(String data) {
-        return postRawToService(Service.HASTEBIN, data);
-    }
-
-    public PendingRequest<String> wastebin(String data) {
-        return postRawToService(Service.WASTEBIN, data);
+        return createRequest(request).build(mapper, WebParserUtils::handleError);
     }
 
     public static String getUserAgent() {
@@ -237,21 +228,4 @@ public final class WebUtils extends Reliqua {
             return MediaType.parse(type);
         }
     }
-
-    public enum Service {
-        //        HASTEBIN("https://hastebin.com/"),
-        HASTEBIN("https://hasteb.in/"),
-        WASTEBIN("https://wastebin.party/");
-
-        private final String url;
-
-        Service(String u) {
-            this.url = u;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-    }
-
 }
