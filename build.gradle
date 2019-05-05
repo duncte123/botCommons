@@ -41,6 +41,8 @@ repositories {
 dependencies {
     // https://bintray.com/bintray/jcenter/com.fasterxml.jackson.core:jackson-databind
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+    
+    api group: 'org.json', name: 'json', version: '20180813'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-text
     api group: 'org.apache.commons', name: 'commons-text', version: '1.6'
@@ -59,11 +61,11 @@ dependencies {
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     }
     
-    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_79') {
+    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_82') {
         exclude module: 'opus-java'
     }
 
-    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_79') {
+    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_82') {
         exclude module: 'opus-java'
     }
 

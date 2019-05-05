@@ -53,8 +53,6 @@ public final class WebUtils extends Reliqua {
                 .writeTimeout(30L, TimeUnit.SECONDS)
                 .build()
         );
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> getClient().connectionPool().evictAll()));
     }
 
     public PendingRequest<String> getText(String url) {
