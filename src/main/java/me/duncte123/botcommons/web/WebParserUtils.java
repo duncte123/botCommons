@@ -30,7 +30,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 @SuppressWarnings("WeakerAccess")
-public class WebUtilsErrorUtils {
+public class WebParserUtils {
     public static JSONObject toJSONObject(Response response) {
         return new JSONObject(new JSONTokener(getInputStream(response)));
     }
