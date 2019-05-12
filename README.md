@@ -1,4 +1,4 @@
-# BotCommons
+# BotCommons [![CircleCI][circleImage]][circleLink]
 A set of tools for the [JDA] library
 
 
@@ -44,3 +44,5 @@ Usage instructions can be found [here][usage]
 [version]: https://api.bintray.com/packages/duncte123/maven/botcommons/images/download.svg
 [download]: https://bintray.com/duncte123/maven/botcommons/_latestVersion
 [usage]: USAGE.md
+[circleLink]: https://circleci.com/gh/duncte123/botCommons/tree/master
+[circleImage]: https://circleci.com/gh/duncte123/botCommons/tree/master.svg?style=svg
