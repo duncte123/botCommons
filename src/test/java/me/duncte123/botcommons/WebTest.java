@@ -16,11 +16,13 @@
 
 package me.duncte123.botcommons;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import me.duncte123.botcommons.web.WebUtils;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.json.JSONObject;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -29,13 +31,20 @@ import static org.junit.Assert.assertNotNull;
 public class WebTest {
 
     @Test
-    public void testWebUtilsCanSetUserAgentAndWillSendCorrectUserAgent() {
+    public void testWebUtilsCanSetUserAgentAndWillSendCorrectUserAgent() throws JsonProcessingException {
         String userAgent = "Mozilla/5.0 botCommons test";
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode body = mapper.createObjectNode();
+        body.set(
+            "data",
+            mapper.createObjectNode().put("user-agent", userAgent)
+        );
+        String parsed = mapper.writeValueAsString(body);
 
         MockWebServer server = new MockWebServer();
         server.enqueue(new MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
-            .setBody(new JSONObject().put("data", new JSONObject().put("user-agent", userAgent)).toString())
+            .setBody(parsed)
         );
 
         WebUtils.setUserAgent(userAgent);
@@ -43,26 +52,33 @@ public class WebTest {
         assertEquals(userAgent, WebUtils.getUserAgent());
 
         HttpUrl baseUrl = server.url("/user-agent");
+        ObjectNode json = WebUtils.ins.getJSONObject(baseUrl.toString()).execute();
 
-        JSONObject json = WebUtils.ins.getJSONObject(baseUrl.toString()).execute();
-
-        assertEquals(userAgent, json.getJSONObject("data").getString("user-agent"));
+        assertEquals(userAgent, json.get("data").get("user-agent").asText());
     }
 
     @Test
-    public void testAsyncWebRequest() {
+    public void testAsyncWebRequest() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode body = mapper.createObjectNode();
+        body.set(
+            "data",
+            mapper.createObjectNode().put("file", "Hi there")
+        );
+        String parsed = mapper.writeValueAsString(body);
+
         MockWebServer server = new MockWebServer();
         server.enqueue(new MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
-            .setBody(new JSONObject().put("data", new JSONObject().put("file", "Hi there")).toString())
+            .setBody(parsed)
         );
 
         HttpUrl baseUrl = server.url("/llama");
 
         WebUtils.ins.getJSONObject(baseUrl.toString())
-                .async(
-                        json -> assertNotNull(json.getJSONObject("data").getString("file"))
-                );
+            .async(
+                json -> assertNotNull(json.get("data").get("file").asText())
+            );
     }
 
 }

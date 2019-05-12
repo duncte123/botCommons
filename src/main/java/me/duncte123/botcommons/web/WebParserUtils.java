@@ -16,14 +16,15 @@
 
 package me.duncte123.botcommons.web;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.natanbc.reliqua.request.RequestContext;
 import com.github.natanbc.reliqua.request.RequestException;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
@@ -31,8 +32,14 @@ import java.util.zip.InflaterInputStream;
 
 @SuppressWarnings("WeakerAccess")
 public class WebParserUtils {
-    public static JSONObject toJSONObject(Response response) {
-        return new JSONObject(new JSONTokener(getInputStream(response)));
+    @Nullable
+    private static ObjectNode toJSONObject(Response response) throws IOException {
+        return toJSONObject(response, new ObjectMapper());
+    }
+
+    @Nullable
+    public static ObjectNode toJSONObject(Response response, ObjectMapper mapper) throws IOException {
+        return (ObjectNode) mapper.readTree(getInputStream(response));
     }
 
     public static InputStream getInputStream(Response response) {
@@ -69,11 +76,12 @@ public class WebParserUtils {
             return;
         }
 
-        JSONObject json = null;
+        JsonNode json = null;
 
         try {
             json = toJSONObject(response);
-        } catch (JSONException ignored) { }
+        } catch (Exception ignored) {
+        }
 
         if (json != null) {
             context.getErrorConsumer().accept(new RequestException("Unexpected status code " + response.code() + ": " + json, context.getCallStack()));

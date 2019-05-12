@@ -18,13 +18,14 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'java-library'
-    id 'idea'
     id 'maven-publish'
+    id 'idea'
+    id 'com.jfrog.bintray' version '1.8.4'
 }
 
 group = "me.duncte123"
 archivesBaseName = "botCommons"
-version = "0.3.1"
+version = '1.0.' + getBuildNum()
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -135,8 +136,34 @@ publishing {
         }
     }
 }
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'maven'
+        name = 'botcommons'
+        licenses = ['Apache-2.0']
+        publications = ['BintrayUpload']
+        vcsUrl = 'https://github.com/duncte123/botcommons.git'
+        publish = true
+        version {
+            name = project.version
+            released = new Date()
+        }
+    }
+}
 
 publishing {
+    publications {
+        BintrayUpload(MavenPublication) {
+            from components.java
+            groupId group
+            artifactId archivesBaseName
+            version version
+            artifact javadocJar
+            artifact sourcesJar
+        }
+    }
     repositories {
         maven {
             // change to point to your repo, e.g. http://my.org/repo
@@ -144,7 +171,6 @@ publishing {
         }
     }
 }
-
 
 build {
     dependsOn clean
@@ -159,3 +185,6 @@ build {
     publish.mustRunAfter sourcesJar
 }
 
+static def getBuildNum () {
+    return System.getenv('CIRCLE_BUILD_NUM') ?: 'dev'
+}
