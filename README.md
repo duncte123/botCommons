@@ -45,4 +45,4 @@ Usage instructions can be found [here][usage]
 [download]: https://bintray.com/duncte123/maven/botcommons/_latestVersion
 [usage]: USAGE.md
 [circleLink]: https://circleci.com/gh/duncte123/botCommons/tree/master
-[circleImage]: https://circleci.com/gh/duncte123/botCommons/tree/master.svg?style=svg
+[circleImage]: https://circleci.com/gh/duncte123/botCommons/tree/master.svg?style=shield
