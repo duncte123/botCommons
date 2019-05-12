@@ -115,7 +115,7 @@ jar {
 task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.output
     from sourceSets.main.allSource
-    classifier = null
+    classifier = 'sources'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
