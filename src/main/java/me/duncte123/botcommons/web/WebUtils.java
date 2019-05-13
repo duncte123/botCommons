@@ -16,6 +16,11 @@
 
 package me.duncte123.botcommons.web;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.natanbc.reliqua.Reliqua;
 import com.github.natanbc.reliqua.request.PendingRequest;
 import com.github.natanbc.reliqua.util.PendingRequestBuilder;
@@ -27,8 +32,6 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -45,6 +48,7 @@ public final class WebUtils extends Reliqua {
 
     public static final WebUtils ins = new WebUtils();
     private static String USER_AGENT = "Mozilla/5.0 (compatible; BotCommons/" + CommonsInfo.VERSION + "; +https://github.com/duncte123/BotCommons;)";
+    private final ObjectMapper mapper = new ObjectMapper();
 
     private WebUtils() {
         super(
@@ -70,30 +74,30 @@ public final class WebUtils extends Reliqua {
         );
     }
 
-    public PendingRequest<JSONObject> getJSONObject(String url) {
+    public PendingRequest<ObjectNode> getJSONObject(String url) {
         return prepareGet(url, EncodingType.APPLICATION_JSON).build(
-            WebParserUtils::toJSONObject,
+            (res) -> WebParserUtils.toJSONObject(res, mapper),
             WebParserUtils::handleError
         );
     }
 
-    public PendingRequest<JSONArray> getJSONArray(String url) {
+    public PendingRequest<ArrayNode> getJSONArray(String url) {
         return prepareGet(url, EncodingType.APPLICATION_JSON).build(
-            (response) -> new JSONArray(response.body().string()),
+            (res) -> (ArrayNode) mapper.readTree(WebParserUtils.getInputStream(res)),
             WebParserUtils::handleError
         );
     }
 
     public PendingRequest<InputStream> getInputStream(String url) {
         return prepareGet(url).build(
-            (response) -> response.body().byteStream(),
+            WebParserUtils::getInputStream,
             WebParserUtils::handleError
         );
     }
 
     public PendingRequest<byte[]> getByteStream(String url) {
         return prepareGet(url).build(
-            (response) -> IOUtil.readFully(response.body().byteStream()),
+            (res) -> IOUtil.readFully(WebParserUtils.getInputStream(res)),
             WebParserUtils::handleError
         );
     }
@@ -147,8 +151,14 @@ public final class WebUtils extends Reliqua {
             .addHeader("Accept", accept.getType()));
     }
 
-    public <T> PendingRequest<T> postJSON(String url, JSONObject data, ResponseMapper<T> mapper) {
-        return postJSON(url, data.toString(), mapper);
+    public <T> PendingRequest<T> postJSON(String url, JsonNode data, ResponseMapper<T> responseMapper) {
+        try {
+            return postJSON(url, mapper.writeValueAsString(data), responseMapper);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+
+            return null;
+        }
     }
 
     public <T> PendingRequest<T> postJSON(String url, String data, ResponseMapper<T> mapper) {
@@ -161,26 +171,33 @@ public final class WebUtils extends Reliqua {
             );
     }
 
-    public JSONArray translate(String sourceLang, String targetLang, String input) {
-        return getJSONArray(
+    public ArrayNode translate(String sourceLang, String targetLang, String input) {
+        return (ArrayNode) getJSONArray(
             "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sourceLang + "&tl=" + targetLang + "&dt=t&q=" + input
         )
             .execute()
-            .getJSONArray(0)
-            .getJSONArray(0);
+            .get(0)
+            .get(0);
     }
 
     public PendingRequest<String> shortenUrl(String url, String domain, String apiKey, GoogleLinkLength linkLength) {
+        final ObjectNode json = mapper.createObjectNode();
+
+        json.set("dynamicLinkInfo",
+            mapper.createObjectNode()
+                .put("domainUriPrefix", domain)
+                .put("link", url)
+        );
+        json.set("suffix",
+            mapper.createObjectNode()
+                .put("option", linkLength.name())
+        );
+
         return postJSON(
-            "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=" +
-                apiKey,
-            new JSONObject()
-                .put("dynamicLinkInfo",
-                    new JSONObject().put("domainUriPrefix", domain).put("link", url)
-                )
-                .put("suffix", new JSONObject().put("option", linkLength.name()))
-            ,
-            (r) -> toJSONObject(r).getString("shortLink"));
+            "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=" + apiKey,
+            json,
+            (r) -> toJSONObject(r, mapper).get("shortLink").asText()
+        );
     }
 
     public PendingRequest<String> shortenUrl(String url, String apiKey) {
@@ -188,7 +205,7 @@ public final class WebUtils extends Reliqua {
     }
 
     public PendingRequest<String> shortenUrl(String url, String domain, String apiKey) {
-        return shortenUrl(url, "lnk.dunctebot.com", apiKey, GoogleLinkLength.UNGUESSABLE);
+        return shortenUrl(url, domain, apiKey, GoogleLinkLength.SHORT);
     }
 
     public <T> PendingRequest<T> prepareRaw(Request request, ResponseMapper<T> mapper) {
