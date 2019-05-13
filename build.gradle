@@ -62,11 +62,11 @@ dependencies {
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     }
     
-    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_82') {
+    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_86') {
         exclude module: 'opus-java'
     }
 
-    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_82') {
+    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_86') {
         exclude module: 'opus-java'
     }
 
