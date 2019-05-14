@@ -36,7 +36,19 @@ import java.util.function.Consumer;
 
 import static me.duncte123.botcommons.messaging.EmbedUtils.embedToMessage;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MessageUtils {
+
+    private static String errorReaction = "❌";
+    private static String successReaction = "✅";
+
+    public static void setErrorReaction(String errorReaction) {
+        MessageUtils.errorReaction = errorReaction;
+    }
+
+    public static void setSuccessReaction(String successReaction) {
+        MessageUtils.successReaction = successReaction;
+    }
 
     /**
      * This will react with a ❌ if the user doesn't have permission to run the command
@@ -52,8 +64,8 @@ public class MessageUtils {
                 return;
             }
         }
-        message.addReaction("❌").queue(null, (ignored) -> {
-        });
+
+        message.addReaction(errorReaction).queue(null, (ignored) -> { });
     }
 
     /**
@@ -81,8 +93,7 @@ public class MessageUtils {
         if (message.getChannelType() == ChannelType.TEXT) {
             TextChannel channel = message.getTextChannel();
             if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_HISTORY)) {
-                message.addReaction("✅").queue(null, (ignored) -> {
-                });
+                message.addReaction(successReaction).queue(null, (ignored) -> {});
             }
         }
     }
