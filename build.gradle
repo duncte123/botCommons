@@ -25,10 +25,10 @@ plugins {
 
 group = "me.duncte123"
 archivesBaseName = "botCommons"
-version = '1.0.' + getBuildNum()
+version = getVersionPrefix() + '1.0.' + getBuildNum()
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     jcenter()
@@ -181,6 +181,10 @@ build {
     javadocJar.mustRunAfter jar
     sourcesJar.mustRunAfter javadocJar
     publish.mustRunAfter sourcesJar
+}
+
+static def getVersionPrefix() {
+    return System.getenv('VERSION_PREFIX') ?: ''
 }
 
 static def getBuildNum () {

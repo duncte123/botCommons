@@ -36,6 +36,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -137,7 +139,7 @@ public final class WebUtils extends Reliqua {
         final StringBuilder postParams = new StringBuilder();
 
         for (final Map.Entry<String, Object> entry : postFields.entrySet()) {
-            postParams.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+            postParams.append(entry.getKey()).append("=").append(urlEncode(String.valueOf(entry.getValue()))).append("&");
         }
 
         return createRequest(defaultRequest()
@@ -225,6 +227,17 @@ public final class WebUtils extends Reliqua {
             .get()
             .addHeader("User-Agent", USER_AGENT)
             .addHeader("cache-control", "no-cache");
+    }
+
+    private String urlEncode(String input) {
+        try {
+            // We're on java 8 intellij
+            //noinspection CharsetObjectCanBeUsed
+            return URLEncoder.encode(input, "UTF-8");
+        }
+        catch (UnsupportedEncodingException ignored) {
+            return ""; // Should never happen as we are using UTF-8
+        }
     }
 
     public enum EncodingType {
