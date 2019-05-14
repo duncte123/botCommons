@@ -115,14 +115,14 @@ workflows:
         jobs:
             - build
             - deploy:
-            requires:
-                - build
-            filters:
-                branches:
-                    only: master
-                    - deploy_v4:
-                requires:
-                    - build
-                filters:
-                    branches:
-                        only: jda-v4
+                  requires:
+                      - build
+                  filters:
+                      branches:
+                          only: master
+            - deploy_v4:
+                  requires:
+                      - build
+                  filters:
+                      branches:
+                          only: jda-v4
