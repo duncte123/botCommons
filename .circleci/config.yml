@@ -4,57 +4,125 @@
 #
 version: 2
 jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
+    build:
+        docker:
+            # specify the version you desire here
+            - image: circleci/openjdk:8-jdk
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
+            # Specify service dependencies here if necessary
+            # CircleCI maintains a library of pre-built images
+            # documented at https://circleci.com/docs/2.0/circleci-images/
+            # - image: circleci/postgres:9.4
 
-    working_directory: ~/repo
+        working_directory: ~/repo
 
-    environment:
-      # Customize the JVM maximum heap limit
-      JVM_OPTS: -Xmx3200m
-      TERM: dumb
+        environment:
+            # Customize the JVM maximum heap limit
+            JVM_OPTS: -Xmx3200m
+            TERM: dumb
 
-    steps:
-      - checkout
+        steps:
+            - checkout
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            # Download and cache dependencies
+            - restore_cache:
+                  keys:
+                      - v1-dependencies-{{ checksum "build.gradle" }}
+                      # fallback to using the latest cache if no exact match is found
+                      - v1-dependencies-
 
-      - run: ./gradlew dependencies
+            - run: ./gradlew dependencies
 
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+            - save_cache:
+                  paths:
+                      - ~/.gradle
+                  key: v1-dependencies-{{ checksum "build.gradle" }}
 
-      - run: ./gradlew build
+            - run: ./gradlew build
 
-      # run tests!
-      - run: ./gradlew test
+            # run tests!
+            - run: ./gradlew test
 
-#      - run:
-#          name: "Upload to github if on master"
-#          command: |
-#            if [[ $CIRCLE_BRANCH == 'master' ]];
-#            then
-#                ./gradlew githubRelease;
-#            fi
+            - persist_to_workspace:
+                  root: ./
+                  paths:
+                      - ./
 
-      - run:
-          name: "Upload to bintray if on master"
-          command: |
-            if [[ $CIRCLE_BRANCH == 'master' ]];
-            then
-                ./gradlew bintrayUpload;
-            fi
+        #      - run:
+        #          name: "Upload to github if on master"
+        #          command: |
+        #            if [[ $CIRCLE_BRANCH == 'master' ]];
+        #            then
+        #                ./gradlew githubRelease;
+        #            fi
+
+
+        deploy:
+            docker:
+                # specify the version you desire here
+                - image: circleci/openjdk:8-jdk
+
+                # Specify service dependencies here if necessary
+                # CircleCI maintains a library of pre-built images
+                # documented at https://circleci.com/docs/2.0/circleci-images/
+                # - image: circleci/postgres:9.4
+
+            working_directory: ~/repo
+
+            environment:
+                # Customize the JVM maximum heap limit
+                JVM_OPTS: -Xmx3200m
+                TERM: dumb
+
+            steps:
+                - attach_workspace:
+                      at: ./
+
+                - run:
+                      name: "Upload if on master"
+                      command: ./gradlew bintrayUpload;
+
+        deploy_v4:
+            docker:
+                # specify the version you desire here
+                - image: circleci/openjdk:8-jdk
+
+                # Specify service dependencies here if necessary
+                # CircleCI maintains a library of pre-built images
+                # documented at https://circleci.com/docs/2.0/circleci-images/
+                # - image: circleci/postgres:9.4
+
+            working_directory: ~/repo
+
+            environment:
+                # Customize the JVM maximum heap limit
+                JVM_OPTS: -Xmx3200m
+                TERM: dumb
+                VERSION_PREFIX: "JDA_4_"
+
+            steps:
+                - attach_workspace:
+                      at: ./
+
+                - run:
+                      name: "Upload if on master"
+                      command: ./gradlew bintrayUpload;
+
+
+workflows:
+    version: 2
+    build_and_test:
+        jobs:
+            - build
+            - deploy:
+            requires:
+                - build
+            filters:
+                branches:
+                    only: master
+                    - deploy_v4:
+                requires:
+                    - build
+                filters:
+                    branches:
+                        only: jda-v4
