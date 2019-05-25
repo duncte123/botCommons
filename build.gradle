@@ -41,7 +41,7 @@ repositories {
 
 dependencies {
     // https://bintray.com/bintray/jcenter/com.fasterxml.jackson.core:jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-text
     api group: 'org.apache.commons', name: 'commons-text', version: '1.6'
