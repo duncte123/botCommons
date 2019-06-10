@@ -4,7 +4,7 @@
 
 Setting the default embed builder:
 ```java
-import me.duncte123.botcommons.messaging.EmbeUtils;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 class SettingBuilderExample {
@@ -19,7 +19,7 @@ class SettingBuilderExample {
 
 Creating an embed:
 ```java
-import me.duncte123.botcommons.messaging.EmbeUtils;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 
@@ -34,7 +34,7 @@ class SendingMessageExample {
 
 Creating an embed with image:
 ```java
-import me.duncte123.botcommons.messaging.EmbeUtils;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 
