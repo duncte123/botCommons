@@ -40,7 +40,8 @@ import net.dv8tion.jda.core.entities.TextChannel;
 
 class SendingMessageExample {
     public void sendMessageExample(TextChannel channel) {
-      MessageEmbed embed = EmbedUtils.embedImage("https://cdn.duncte123.me/Lw6XIw2gYVEe7j4D3eEXYehqhADm3dTq7VEV3RTb7jXBIjKD7nES1R8vIVFG2Z3mYeqG1G").build();
+      String url = "https://cdn.duncte123.me/wr625PaolD";
+      MessageEmbed embed = EmbedUtils.embedImage(url).build();
       
       channel.sendMessage(embed).queue();
     }
