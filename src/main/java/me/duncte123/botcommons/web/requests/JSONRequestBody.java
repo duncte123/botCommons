@@ -25,22 +25,22 @@ import org.jetbrains.annotations.NotNull;
 
 public class JSONRequestBody implements IRequestBody {
 
-    private final String json;
+    private final byte[] json;
 
-    private JSONRequestBody(String json) {
+    private JSONRequestBody(byte[] json) {
         this.json = json;
     }
 
     public static JSONRequestBody fromJSONObject(@NotNull org.json.JSONObject jsonObject) {
-        return new JSONRequestBody(jsonObject.toString());
+        return new JSONRequestBody(jsonObject.toString().getBytes());
     }
 
     public static JSONRequestBody fromJSONArray(@NotNull org.json.JSONArray jsonObject) {
-        return new JSONRequestBody(jsonObject.toString());
+        return new JSONRequestBody(jsonObject.toString().getBytes());
     }
 
     public static JSONRequestBody fromJackson(@NotNull JsonNode jsonNode) throws JsonProcessingException {
-        return new JSONRequestBody(new ObjectMapper().writeValueAsString(jsonNode));
+        return new JSONRequestBody(new ObjectMapper().writeValueAsBytes(jsonNode));
     }
 
     @Override
@@ -50,6 +50,6 @@ public class JSONRequestBody implements IRequestBody {
 
     @Override
     public @NotNull RequestBody toRequestBody() {
-        return RequestBody.create(getMediaType(), json);
+        return RequestBody.create(json);
     }
 }

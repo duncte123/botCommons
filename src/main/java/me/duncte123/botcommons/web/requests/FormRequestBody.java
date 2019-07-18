@@ -56,6 +56,6 @@ public class FormRequestBody implements IRequestBody {
 
         final String postString = StringUtils.replaceLast(postParams.toString(), "\\&", "");
 
-        return RequestBody.create(getMediaType(), postString);
+        return RequestBody.create(postString.getBytes());
     }
 }
