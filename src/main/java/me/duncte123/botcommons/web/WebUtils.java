@@ -17,7 +17,6 @@
 package me.duncte123.botcommons.web;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -26,20 +25,17 @@ import com.github.natanbc.reliqua.request.PendingRequest;
 import com.github.natanbc.reliqua.util.PendingRequestBuilder;
 import com.github.natanbc.reliqua.util.ResponseMapper;
 import me.duncte123.botcommons.CommonsInfo;
-import me.duncte123.botcommons.StringUtils;
+import me.duncte123.botcommons.web.requests.IRequestBody;
+import me.duncte123.botcommons.web.requests.JSONRequestBody;
 import net.dv8tion.jda.core.utils.IOUtil;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static me.duncte123.botcommons.web.WebParserUtils.toJSONObject;
@@ -70,21 +66,21 @@ public final class WebUtils extends Reliqua {
     }
 
     public PendingRequest<Document> scrapeWebPage(String url) {
-        return prepareGet(url, EncodingType.TEXT_HTML).build(
+        return prepareGet(url, ContentType.TEXT_HTML).build(
             (response) -> Jsoup.parse(response.body().string()),
             WebParserUtils::handleError
         );
     }
 
     public PendingRequest<ObjectNode> getJSONObject(String url) {
-        return prepareGet(url, EncodingType.APPLICATION_JSON).build(
+        return prepareGet(url, ContentType.JSON).build(
             (res) -> WebParserUtils.toJSONObject(res, mapper),
             WebParserUtils::handleError
         );
     }
 
     public PendingRequest<ArrayNode> getJSONArray(String url) {
-        return prepareGet(url, EncodingType.APPLICATION_JSON).build(
+        return prepareGet(url, ContentType.JSON).build(
             (res) -> (ArrayNode) mapper.readTree(WebParserUtils.getInputStream(res)),
             WebParserUtils::handleError
         );
@@ -104,73 +100,23 @@ public final class WebUtils extends Reliqua {
         );
     }
 
-    public PendingRequestBuilder prepareGet(String url, EncodingType accept) {
+    public PendingRequestBuilder prepareGet(String url, ContentType accept) {
         return createRequest(defaultRequest()
             .url(url)
             .addHeader("Accept", accept.getType()));
     }
 
     public PendingRequestBuilder prepareGet(String url) {
-        return prepareGet(url, EncodingType.TEXT_HTML);
+        return prepareGet(url, ContentType.ANY);
     }
 
-    public PendingRequest<String> preparePost(String url, Map<String, Object> postFields) {
-        return preparePost(url, postFields, EncodingType.APPLICATION_URLENCODED).build(
-            (response) -> response.body().string(),
-            WebParserUtils::handleError
+    public PendingRequestBuilder postRequest(String url, IRequestBody body) {
+        return createRequest(
+            defaultRequest()
+                .url(url)
+                .header("content-Type", body.getContentType())
+                .post(body.toRequestBody())
         );
-    }
-
-    public PendingRequest<String> preparePost(String url, EncodingType accept) {
-        return preparePost(url, new HashMap<>(), accept).build(
-            (response) -> response.body().string(),
-            WebParserUtils::handleError
-        );
-    }
-
-    public PendingRequest<String> preparePost(String url) {
-        return preparePost(url, new HashMap<>(), EncodingType.APPLICATION_URLENCODED).build(
-            (response) -> response.body().string(),
-            WebParserUtils::handleError
-        );
-    }
-
-    public PendingRequestBuilder preparePost(String url, Map<String, Object> postFields, EncodingType accept) {
-        final StringBuilder postParams = new StringBuilder();
-
-        for (final Map.Entry<String, Object> entry : postFields.entrySet()) {
-            postParams.append(entry.getKey()).append("=").append(urlEncode(String.valueOf(entry.getValue()))).append("&");
-        }
-
-        return createRequest(defaultRequest()
-            .url(url)
-            .post(
-                RequestBody.create(
-                    EncodingType.APPLICATION_URLENCODED.toMediaType(),
-                    StringUtils.replaceLast(postParams.toString(), "\\&", "")
-                )
-            )
-            .addHeader("Accept", accept.getType()));
-    }
-
-    public <T> PendingRequest<T> postJSON(String url, JsonNode data, ResponseMapper<T> responseMapper) {
-        try {
-            return postJSON(url, mapper.writeValueAsString(data), responseMapper);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-
-            return null;
-        }
-    }
-
-    public <T> PendingRequest<T> postJSON(String url, String data, ResponseMapper<T> mapper) {
-        return createRequest(defaultRequest()
-            .url(url)
-            .post(RequestBody.create(EncodingType.APPLICATION_JSON.toMediaType(), data)))
-            .build(
-                mapper,
-                WebParserUtils::handleError
-            );
     }
 
     public ArrayNode translate(String sourceLang, String targetLang, String input) {
@@ -195,19 +141,20 @@ public final class WebUtils extends Reliqua {
                 .put("option", linkLength.name())
         );
 
-        return postJSON(
-            "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=" + apiKey,
-            json,
-            (r) -> toJSONObject(r, mapper).get("shortLink").asText()
-        );
-    }
+        try {
+            return postRequest(
+                "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=" + apiKey,
+                JSONRequestBody.fromJackson(json)
+            )
+                .build(
+                    (r) -> toJSONObject(r, mapper).get("shortLink").asText(),
+                    WebParserUtils::handleError
+                );
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
 
-    public PendingRequest<String> shortenUrl(String url, String apiKey) {
-        return shortenUrl(url, "lnk.dunctebot.com", apiKey);
-    }
-
-    public PendingRequest<String> shortenUrl(String url, String domain, String apiKey) {
-        return shortenUrl(url, domain, apiKey, GoogleLinkLength.SHORT);
+            return null;
+        }
     }
 
     public <T> PendingRequest<T> prepareRaw(Request request, ResponseMapper<T> mapper) {
@@ -229,37 +176,13 @@ public final class WebUtils extends Reliqua {
             .addHeader("cache-control", "no-cache");
     }
 
-    private String urlEncode(String input) {
+    public static String urlEncodeString(String input) {
         try {
             // We're on java 8 intellij
             //noinspection CharsetObjectCanBeUsed
             return URLEncoder.encode(input, "UTF-8");
-        }
-        catch (UnsupportedEncodingException ignored) {
+        } catch (UnsupportedEncodingException ignored) {
             return ""; // Should never happen as we are using UTF-8
-        }
-    }
-
-    public enum EncodingType {
-        APPLICATION_JSON("application/json"),
-        APPLICATION_XML("application/xml"),
-        APPLICATION_URLENCODED("application/x-www-form-urlencoded"),
-        TEXT_PLAIN("text/plain"),
-        TEXT_HTML("text/html"),
-        APPLICATION_OCTET_STREAM("application/octet-stream");
-
-        private String type;
-
-        EncodingType(String type) {
-            this.type = type;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public MediaType toMediaType() {
-            return MediaType.parse(type);
         }
     }
 }

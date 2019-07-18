@@ -40,6 +40,9 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.json/json
+    compileOnly group: 'org.json', name: 'json', version: '20180813' // Provided by the user
+
     // https://bintray.com/bintray/jcenter/com.fasterxml.jackson.core:jackson-databind
     api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
 
