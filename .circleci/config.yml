@@ -48,14 +48,6 @@ jobs:
                   paths:
                       - ./
 
-        #      - run:
-        #          name: "Upload to github if on master"
-        #          command: |
-        #            if [[ $CIRCLE_BRANCH == 'master' ]];
-        #            then
-        #                ./gradlew githubRelease;
-        #            fi
-
 
     deploy:
         docker:

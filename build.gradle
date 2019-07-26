@@ -40,39 +40,40 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.json/json
+    compileOnly group: 'org.json', name: 'json', version: '20180813' // Provided by the user
+
     // https://bintray.com/bintray/jcenter/com.fasterxml.jackson.core:jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
-    
-    api group: 'org.json', name: 'json', version: '20180813'
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-text
     api group: 'org.apache.commons', name: 'commons-text', version: '1.6'
     
     //https://github.com/google/guava/releases/latest
-    api group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
+//    api group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
     
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     api group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
     
     // https://bintray.com/bintray/jcenter/com.squareup.okhttp3:okhttp
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.12.1'
+    api group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.0.1'
     
     // https://bintray.com/natanbc/maven/reliqua/
-    api(group: 'com.github.natanbc', name: 'reliqua', version: '2.4') {
+    api(group: 'me.duncte123', name: 'reliqua', version: '2.4.8') {
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     }
     
-    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_86') {
+    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.BETA.0_28') {
         exclude module: 'opus-java'
     }
 
-    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.ALPHA.0_86') {
+    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.BETA.0_28') {
         exclude module: 'opus-java'
     }
 
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 
-    testImplementation 'com.squareup.okhttp3:mockwebserver:3.12.1'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.0.1'
 }
 
 javadoc {

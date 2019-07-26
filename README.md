@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'me.duncte123', name: 'botcommons', version: '[VERSION]'
+    implementation group: 'me.duncte123', name: 'botCommons', version: '[VERSION]'
 }
 ```
 
@@ -28,7 +28,7 @@ dependencies {
 
 <dependency>
   <groupId>me.duncte123</groupId>
-  <artifactId>botcommons</artifactId>
+  <artifactId>botCommons</artifactId>
   <version>[VERSION]</version>
   <type>pom</type>
 </dependency>
