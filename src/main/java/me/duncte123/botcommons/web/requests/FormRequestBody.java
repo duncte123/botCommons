@@ -16,13 +16,13 @@
 
 package me.duncte123.botcommons.web.requests;
 
-import me.duncte123.botcommons.StringUtils;
 import me.duncte123.botcommons.web.ContentType;
 import okhttp3.RequestBody;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static me.duncte123.botcommons.web.WebUtils.urlEncodeString;
 
@@ -31,7 +31,7 @@ public class FormRequestBody implements IRequestBody {
     private final Map<String, String> params = new HashMap<>();
 
     public FormRequestBody append(@NotNull String key, @NotNull String value) {
-        params.put(key, value);
+        params.put(urlEncodeString(key), urlEncodeString(value));
 
         return this;
     }
@@ -43,19 +43,11 @@ public class FormRequestBody implements IRequestBody {
 
     @Override
     public @NotNull RequestBody toRequestBody() {
-        final StringBuilder postParams = new StringBuilder();
+        final String body = params.entrySet()
+            .stream()
+            .map((entry) -> entry.getKey() + "=" + entry.getValue())
+            .collect(Collectors.joining("&"));
 
-        for (final Map.Entry<String, String> entry : params.entrySet()) {
-            postParams
-                .append(urlEncodeString(entry.getKey()))
-                .append('=')
-                .append(urlEncodeString(entry.getValue()))
-                .append('&');
-
-        }
-
-        final String postString = StringUtils.replaceLast(postParams.toString(), "\\&", "");
-
-        return RequestBody.create(postString.getBytes());
+        return RequestBody.create(body.getBytes());
     }
 }
