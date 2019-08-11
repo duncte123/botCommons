@@ -23,6 +23,8 @@ import me.duncte123.botcommons.web.ContentType;
 import okhttp3.RequestBody;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+
 public class JSONRequestBody implements IRequestBody {
 
     private final byte[] json;
@@ -41,6 +43,12 @@ public class JSONRequestBody implements IRequestBody {
 
     public static JSONRequestBody fromJackson(@NotNull JsonNode jsonNode) throws JsonProcessingException {
         return new JSONRequestBody(new ObjectMapper().writeValueAsBytes(jsonNode));
+    }
+
+    public static JSONRequestBody fromString(@NotNull String json) throws IOException {
+        final ObjectMapper mapper = new ObjectMapper();
+
+        return new JSONRequestBody(mapper.writeValueAsBytes(mapper.readTree(json).traverse()));
     }
 
     @Override
