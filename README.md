@@ -40,6 +40,10 @@ Make sure to replace `[VERSION]` with the version listed above.
 
 Usage instructions can be found [here][usage]
 
+## Bot not shutting down?
+A shutdown method was created in the `BotCommons` class. <br>
+This method also accepts your JDA or ShardManager instance for killing the threads that OkHttp created, because of these running threads your bot will not shut down.
+
 [JDA]: https://github.com/DV8FromTheWorld/JDA
 [version]: https://api.bintray.com/packages/duncte123/maven/botcommons/images/download.svg
 [download]: https://bintray.com/duncte123/maven/botcommons/_latestVersion

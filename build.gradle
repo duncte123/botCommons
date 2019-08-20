@@ -40,17 +40,11 @@ repositories {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/org.json/json
-    compileOnly group: 'org.json', name: 'json', version: '20180813' // Provided by the user
-
     // https://bintray.com/bintray/jcenter/com.fasterxml.jackson.core:jackson-databind
     api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-text
     api group: 'org.apache.commons', name: 'commons-text', version: '1.6'
-    
-    //https://github.com/google/guava/releases/latest
-//    api group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
     
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     api group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
@@ -62,12 +56,15 @@ dependencies {
     api(group: 'me.duncte123', name: 'reliqua', version: '2.4.8') {
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     }
-    
-    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.BETA.0_28') {
+
+    // https://mvnrepository.com/artifact/org.json/json
+    compileOnly group: 'org.json', name: 'json', version: '20180813' // Provided by the user
+
+    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.0.0_44') {
         exclude module: 'opus-java'
     }
 
-    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.BETA.0_28') {
+    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.0.0_44') {
         exclude module: 'opus-java'
     }
 
@@ -86,7 +83,7 @@ javadoc {
 
 task sourcesForRelease(type: Copy) {
     from('src/main/java') {
-        include '**/CommonsInfo.java'
+        include '**/BotCommons.java'
         filter(ReplaceTokens, tokens: [
                 version: version
         ])
@@ -97,7 +94,7 @@ task sourcesForRelease(type: Copy) {
 
 task generateJavaSources(type: SourceTask) {
     def javaSources = sourceSets.main.allJava.filter {
-        it.name != 'CommonsInfo.java'
+        it.name != 'BotCommons.java'
     }
     source = javaSources + sourcesForRelease.destinationDir
 
