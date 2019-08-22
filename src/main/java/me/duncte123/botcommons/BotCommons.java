@@ -34,6 +34,7 @@ public class BotCommons {
             jda.getHttpClient().connectionPool().evictAll();
             jda.getHttpClient().dispatcher().executorService().shutdown();
         });
+        manager.shutdown();
         shutdown();
     }
 
@@ -45,6 +46,7 @@ public class BotCommons {
     public static void shutdown(JDA jda) {
         jda.getHttpClient().connectionPool().evictAll();
         jda.getHttpClient().dispatcher().executorService().shutdown();
+        jda.shutdown();
         shutdown();
     }
 
