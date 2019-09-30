@@ -30,11 +30,11 @@ public class BotCommons {
      * @param manager Your {@link ShardManager ShardManager} instance for killing the threads that JDA does not shut down and keep your bot up
      */
     public static void shutdown(ShardManager manager) {
+        manager.shutdown();
         manager.getShardCache().forEach((jda) -> {
             jda.getHttpClient().connectionPool().evictAll();
             jda.getHttpClient().dispatcher().executorService().shutdown();
         });
-        manager.shutdown();
         shutdown();
     }
 
@@ -44,9 +44,9 @@ public class BotCommons {
      * @param jda Your {@link JDA JDA} instance for killing the threads that JDA does not shut down and keep your bot up
      */
     public static void shutdown(JDA jda) {
+        jda.shutdown();
         jda.getHttpClient().connectionPool().evictAll();
         jda.getHttpClient().dispatcher().executorService().shutdown();
-        jda.shutdown();
         shutdown();
     }
 
