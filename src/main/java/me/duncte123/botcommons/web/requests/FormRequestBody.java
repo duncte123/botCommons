@@ -48,6 +48,6 @@ public class FormRequestBody implements IRequestBody {
             .map((entry) -> entry.getKey() + "=" + entry.getValue())
             .collect(Collectors.joining("&"));
 
-        return RequestBody.create(body.getBytes());
+        return RequestBody.create(null, body.getBytes());
     }
 }

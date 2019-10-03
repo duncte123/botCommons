@@ -28,6 +28,6 @@ public class EmptyFromRequestBody implements IRequestBody {
 
     @Override
     public @NotNull RequestBody toRequestBody() {
-        return RequestBody.create(new byte[0]);
+        return RequestBody.create(null, new byte[0]);
     }
 }
