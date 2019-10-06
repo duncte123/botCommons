@@ -28,7 +28,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -49,6 +48,14 @@ public class MessageUtils {
 
     public static void setSuccessReaction(String successReaction) {
         MessageUtils.successReaction = successReaction;
+    }
+
+    public static String getErrorReaction() {
+        return errorReaction;
+    }
+
+    public static String getSuccessReaction() {
+        return successReaction;
     }
 
     /**
