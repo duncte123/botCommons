@@ -60,11 +60,11 @@ dependencies {
     // https://mvnrepository.com/artifact/org.json/json
     compileOnly group: 'org.json', name: 'json', version: '20180813' // Provided by the user
 
-    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.0.0_44') {
+    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.0.0_59') {
         exclude module: 'opus-java'
     }
 
-    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.0.0_44') {
+    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.0.0_59') {
         exclude module: 'opus-java'
     }
 
