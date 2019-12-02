@@ -54,7 +54,9 @@ public final class WebUtils extends Reliqua {
                 .connectTimeout(30L, TimeUnit.SECONDS)
                 .readTimeout(30L, TimeUnit.SECONDS)
                 .writeTimeout(30L, TimeUnit.SECONDS)
-                .build()
+                .build(),
+            null,
+            true
         );
     }
 
@@ -178,8 +180,6 @@ public final class WebUtils extends Reliqua {
 
     public static String urlEncodeString(String input) {
         try {
-            // We're on java 8 intellij
-            //noinspection CharsetObjectCanBeUsed
             return URLEncoder.encode(input, "UTF-8");
         } catch (UnsupportedEncodingException ignored) {
             return ""; // Should never happen as we are using UTF-8
