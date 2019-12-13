@@ -16,6 +16,8 @@
 
 package me.duncte123.botcommons;
 
+import net.dv8tion.jda.internal.utils.Checks;
+
 public class StringUtils {
 
     /**
@@ -23,15 +25,35 @@ public class StringUtils {
      *
      * @param text
      *         the text to replace
-     * @param regex
-     *         the regex or something
+     * @param search
+     *         The string to search for
      * @param replacement
      *         what to replace it with
      *
      * @return the replaced string
+     *
+     * @throws IllegalArgumentException when text or search are blank or when any of the arguments are null
      */
-    public static String replaceLast(String text, String regex, String replacement) {
-        return text.replaceFirst("(?s)(.*)" + regex, "$1" + replacement);
+    public static String replaceLast(String text, String search, String replacement) {
+        Checks.notNull(text, "The text parameter may not be null");
+        Checks.notNull(search, "The search parameter may not be null");
+        Checks.notNull(replacement, "The replacement parameter may not be null");
+
+        if (text.isEmpty() || search.isEmpty()) {
+            throw new IllegalArgumentException("Text and search may not be blank");
+        }
+
+        final int index = text.lastIndexOf(search);
+
+        // Search not found
+        if (index == -1) {
+            return text;
+        }
+
+        final String firstPart = text.substring(0, index);
+        final String lastPart = text.substring(index + search.length());
+
+        return firstPart + replacement + lastPart;
     }
 
 }
