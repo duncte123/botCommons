@@ -63,3 +63,27 @@ class WebUtilsJsonExample {
     }
 }
 ```
+
+```java
+import me.duncte123.botcommons.web.WebUtils;
+import me.duncte123.botcommons.web.requests.JSONRequestBody;
+import net.dv8tion.jda.api.utils.data.DataObject;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.EmbedBuilder;
+
+class WebUtilsJsonExample {
+    public void jsonExample() {
+        WebUtils.setUserAgent("MyApp/1.0");
+        
+        MessageEmbed embed = new EmbedBuilder().build();
+        DataObject data = embed.toData();
+        // Available bodies are EmptyFromRequestBody, FromRequestBody, JSONRequestBody, PlainTextRequestBody
+        // Or use the IRequestBody interface to write your own
+        JSONRequestBody body = JSONRequestBody.fromDataObject(data);
+        
+        WebUtils.ins.postRequest("https://example.com/json-post-request", body).async(
+            (json) -> System.out.println(json) // Do something with the result
+        );
+    }
+}
+```
