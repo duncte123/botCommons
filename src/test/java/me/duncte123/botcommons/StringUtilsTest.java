@@ -53,4 +53,20 @@ public class StringUtilsTest {
         StringUtils.replaceLast("hello world", null, "and");
     }
 
+    @Test
+    public void testNormalStringAbbreviations() {
+        String res1 = StringUtils.abbreviate("Hello world, this is a very long string", 10);
+        String res2 = StringUtils.abbreviate("Hello", 10);
+
+        assertEquals("Hello w...", res1);
+        assertEquals("Hello", res2);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFailingStringAbbreviations() {
+        StringUtils.abbreviate("", 10);
+        StringUtils.abbreviate(null, 10);
+        StringUtils.abbreviate("bla bla bla", 0);
+        StringUtils.abbreviate("bla bla bla", -1);
+    }
 }

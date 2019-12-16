@@ -24,24 +24,21 @@ public class StringUtils {
      * Replaces the last thing in a string
      *
      * @param text
-     *         the text to replace
+     *     the text to replace
      * @param search
-     *         The string to search for
+     *     The string to search for
      * @param replacement
-     *         what to replace it with
+     *     what to replace it with
      *
      * @return the replaced string
      *
-     * @throws IllegalArgumentException when text or search are blank or when any of the arguments are null
+     * @throws IllegalArgumentException
+     *     when text or search are blank or when any of the arguments are null
      */
     public static String replaceLast(String text, String search, String replacement) {
-        Checks.notNull(text, "The text parameter may not be null");
-        Checks.notNull(search, "The search parameter may not be null");
-        Checks.notNull(replacement, "The replacement parameter may not be null");
-
-        if (text.isEmpty() || search.isEmpty()) {
-            throw new IllegalArgumentException("Text and search may not be blank");
-        }
+        Checks.notBlank(text, "text");
+        Checks.notBlank(search, "search");
+        Checks.notNull(replacement, "replacement");
 
         final int index = text.lastIndexOf(search);
 
@@ -54,6 +51,33 @@ public class StringUtils {
         final String lastPart = text.substring(index + search.length());
 
         return firstPart + replacement + lastPart;
+    }
+
+    /**
+     * Abbreviates the string to your desired length
+     *
+     * @param string
+     *     The string to abbreviate
+     * @param maxLength
+     *     the maximum length of the returned string
+     *
+     * @return The abbreviated string
+     *
+     * @throws IllegalArgumentException
+     *     when the string is blank or null or when maxLength is less than 0
+     */
+    public static String abbreviate(String string, int maxLength) {
+        Checks.notBlank(string, "string");
+        Checks.positive(maxLength, "maxLength");
+
+        final String marker = "...";
+        final int markerLength = marker.length();
+
+        if (string.length() < maxLength - markerLength) {
+            return string;
+        }
+
+        return string.substring(0, maxLength - markerLength) + marker;
     }
 
 }
