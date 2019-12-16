@@ -62,55 +62,99 @@ public final class WebUtils extends Reliqua {
     }
 
     public PendingRequest<String> getText(String url) {
-        return prepareGet(url).build(
-            (response) -> response.body().string(),
-            WebParserUtils::handleError
-        );
+        return getText(url, (f) -> f);
+    }
+
+    public PendingRequest<String> getText(String url, PendingRequestFunction fn) {
+        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url);
+
+        return fn.apply(pendingRequestBuilder)
+            .build(
+                (response) -> response.body().string(),
+                WebParserUtils::handleError
+            );
     }
 
     public PendingRequest<Document> scrapeWebPage(String url) {
-        return prepareGet(url, ContentType.TEXT_HTML).build(
-            (response) -> Jsoup.parse(response.body().string()),
-            WebParserUtils::handleError
-        );
+        return scrapeWebPage(url, (f) -> f);
+    }
+
+    public PendingRequest<Document> scrapeWebPage(String url, PendingRequestFunction fn) {
+        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url, ContentType.TEXT_HTML);
+
+        return fn.apply(pendingRequestBuilder)
+            .build(
+                (response) -> Jsoup.parse(response.body().string()),
+                WebParserUtils::handleError
+            );
     }
 
     public PendingRequest<ObjectNode> getJSONObject(String url) {
-        return prepareGet(url, ContentType.JSON).build(
-            (res) -> WebParserUtils.toJSONObject(res, mapper),
-            WebParserUtils::handleError
-        );
+        return getJSONObject(url, (f) -> f);
+    }
+
+    public PendingRequest<ObjectNode> getJSONObject(String url, PendingRequestFunction fn) {
+        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url, ContentType.JSON);
+
+        return fn.apply(pendingRequestBuilder)
+            .build(
+                (res) -> WebParserUtils.toJSONObject(res, mapper),
+                WebParserUtils::handleError
+            );
     }
 
     public PendingRequest<ArrayNode> getJSONArray(String url) {
-        return prepareGet(url, ContentType.JSON).build(
-            (res) -> (ArrayNode) mapper.readTree(WebParserUtils.getInputStream(res)),
-            WebParserUtils::handleError
-        );
+        return getJSONArray(url, (f) -> f);
+    }
+
+    public PendingRequest<ArrayNode> getJSONArray(String url, PendingRequestFunction fn) {
+        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url, ContentType.JSON);
+
+        return fn.apply(pendingRequestBuilder)
+            .build(
+                (res) -> (ArrayNode) mapper.readTree(WebParserUtils.getInputStream(res)),
+                WebParserUtils::handleError
+            );
     }
 
     public PendingRequest<InputStream> getInputStream(String url) {
-        return prepareGet(url).build(
-            WebParserUtils::getInputStream,
-            WebParserUtils::handleError
-        );
+        return getInputStream(url, (f) -> f);
+    }
+
+    public PendingRequest<InputStream> getInputStream(String url, PendingRequestFunction fn) {
+        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url);
+
+        return fn.apply(pendingRequestBuilder)
+            .build(
+                WebParserUtils::getInputStream,
+                WebParserUtils::handleError
+            );
     }
 
     public PendingRequest<byte[]> getByteStream(String url) {
-        return prepareGet(url).build(
-            (res) -> IOUtil.readFully(WebParserUtils.getInputStream(res)),
-            WebParserUtils::handleError
-        );
+        return getByteStream(url, (f) -> f);
     }
 
-    public PendingRequestBuilder prepareGet(String url, ContentType accept) {
-        return createRequest(defaultRequest()
-            .url(url)
-            .addHeader("Accept", accept.getType()));
+    public PendingRequest<byte[]> getByteStream(String url, PendingRequestFunction fn) {
+        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url);
+
+        return fn.apply(pendingRequestBuilder)
+            .build(
+                (res) -> IOUtil.readFully(WebParserUtils.getInputStream(res)),
+                WebParserUtils::handleError
+            );
     }
 
     public PendingRequestBuilder prepareGet(String url) {
         return prepareGet(url, ContentType.ANY);
+    }
+
+    public PendingRequestBuilder prepareGet(String url, ContentType accept) {
+        return createRequest(
+            defaultRequest()
+                .url(url)
+                .addHeader("Accept", accept.getType())
+        );
     }
 
     public PendingRequestBuilder postRequest(String url, IRequestBody body) {
