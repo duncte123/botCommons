@@ -19,6 +19,8 @@ package me.duncte123.botcommons;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.natanbc.reliqua.request.PendingRequest;
+import com.github.natanbc.reliqua.util.StatusCodeValidator;
 import me.duncte123.botcommons.web.WebUtils;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
@@ -79,6 +81,15 @@ public class WebTest {
             .async(
                 json -> assertNotNull(json.get("data").get("file").asText())
             );
+    }
+
+    @Test
+    public void testPendingRequestFunction() { // Not that I expect it to go wrong
+        final PendingRequest<ObjectNode> pendingRequest = WebUtils.ins.getJSONObject("",
+            (b) -> b.setStatusCodeValidator(StatusCodeValidator.ACCEPT_2XX)
+        );
+
+        assertEquals(StatusCodeValidator.ACCEPT_2XX, pendingRequest.getStatusCodeValidator());
     }
 
 }
