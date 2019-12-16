@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.natanbc.reliqua.request.RequestContext;
 import com.github.natanbc.reliqua.request.RequestException;
+import me.duncte123.botcommons.JSONHelper;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -33,8 +34,8 @@ import java.util.zip.InflaterInputStream;
 @SuppressWarnings("WeakerAccess")
 public class WebParserUtils {
     @Nullable
-    private static ObjectNode toJSONObject(Response response) throws IOException {
-        return toJSONObject(response, new ObjectMapper());
+    public static ObjectNode toJSONObject(Response response) throws IOException {
+        return toJSONObject(response, JSONHelper.createObjectMapper());
     }
 
     @Nullable

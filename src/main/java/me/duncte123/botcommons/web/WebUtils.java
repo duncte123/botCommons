@@ -25,6 +25,7 @@ import com.github.natanbc.reliqua.request.PendingRequest;
 import com.github.natanbc.reliqua.util.PendingRequestBuilder;
 import com.github.natanbc.reliqua.util.ResponseMapper;
 import me.duncte123.botcommons.BotCommons;
+import me.duncte123.botcommons.JSONHelper;
 import me.duncte123.botcommons.web.requests.IRequestBody;
 import me.duncte123.botcommons.web.requests.JSONRequestBody;
 import net.dv8tion.jda.internal.utils.IOUtil;
@@ -46,7 +47,7 @@ public final class WebUtils extends Reliqua {
 
     public static final WebUtils ins = new WebUtils();
     private static String USER_AGENT = "Mozilla/5.0 (compatible; BotCommons/" + BotCommons.VERSION + "; +https://github.com/duncte123/BotCommons;)";
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = JSONHelper.createObjectMapper();
 
     private WebUtils() {
         super(

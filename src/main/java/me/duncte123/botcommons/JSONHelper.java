@@ -1,5 +1,5 @@
 /*
- *    Copyright 2018 Duncan "duncte123" Sterken
+ *    Copyright 2019 Duncan "duncte123" Sterken
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,20 +14,20 @@
  *    limitations under the License.
  */
 
-package me.duncte123.botcommons.config;
+package me.duncte123.botcommons;
 
-import me.duncte123.botcommons.JSONHelper;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
-import java.io.IOException;
+public class JSONHelper {
+    public static ObjectMapper createObjectMapper() {
+        final ObjectMapper mapper = new ObjectMapper();
 
-public class ConfigUtils {
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        mapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
+        mapper.enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
 
-    public static <T> T loadFromFile(String fileName, Class<T> classOfT) throws IOException {
-        return loadFromFile(new File(fileName), classOfT);
-    }
-
-    public static <T> T loadFromFile(File file, Class<T> classOfT) throws IOException {
-        return JSONHelper.createObjectMapper().readValue(file, classOfT);
+        return mapper;
     }
 }

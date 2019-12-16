@@ -19,6 +19,7 @@ package me.duncte123.botcommons.web.requests;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.duncte123.botcommons.JSONHelper;
 import me.duncte123.botcommons.web.ContentType;
 import okhttp3.RequestBody;
 import org.jetbrains.annotations.NotNull;
@@ -42,13 +43,13 @@ public class JSONRequestBody implements IRequestBody {
     }
 
     public static JSONRequestBody fromJackson(@NotNull JsonNode jsonNode) throws JsonProcessingException {
-        return new JSONRequestBody(new ObjectMapper().writeValueAsBytes(jsonNode));
+        return new JSONRequestBody(JSONHelper.createObjectMapper().writeValueAsBytes(jsonNode));
     }
 
     public static JSONRequestBody fromString(@NotNull String json) throws IOException {
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = JSONHelper.createObjectMapper();
 
-        return new JSONRequestBody(mapper.writeValueAsBytes(mapper.readTree(json).traverse()));
+        return new JSONRequestBody(mapper.writeValueAsBytes(mapper.readTree(json)));
     }
 
     @Override
