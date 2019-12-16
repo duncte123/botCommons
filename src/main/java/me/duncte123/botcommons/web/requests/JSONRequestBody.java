@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.duncte123.botcommons.JSONHelper;
 import me.duncte123.botcommons.web.ContentType;
+import net.dv8tion.jda.api.utils.data.DataArray;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import okhttp3.RequestBody;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +34,14 @@ public class JSONRequestBody implements IRequestBody {
 
     private JSONRequestBody(byte[] json) {
         this.json = json;
+    }
+
+    public static JSONRequestBody fromDataObject(@NotNull DataObject data) {
+        return new JSONRequestBody(data.toString().getBytes());
+    }
+
+    public static JSONRequestBody fromDataArray(@NotNull DataArray data) {
+        return new JSONRequestBody(data.toString().getBytes());
     }
 
     public static JSONRequestBody fromJSONObject(@NotNull org.json.JSONObject jsonObject) {
