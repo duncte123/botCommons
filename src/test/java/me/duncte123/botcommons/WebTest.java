@@ -85,7 +85,7 @@ public class WebTest {
 
     @Test
     public void testPendingRequestFunction() { // Not that I expect it to go wrong
-        final PendingRequest<ObjectNode> pendingRequest = WebUtils.ins.getJSONObject("",
+        final PendingRequest<ObjectNode> pendingRequest = WebUtils.ins.getJSONObject("https://example.com/",
             (b) -> b.setStatusCodeValidator(StatusCodeValidator.ACCEPT_2XX)
         );
 
