@@ -130,14 +130,44 @@ public final class WebUtils extends Reliqua {
         );
     }
 
+    /**
+     *
+     * @param url
+     * @return
+     *
+     * @see #scrapeWebPage(String)
+     * @see #scrapeWebPage(String, PendingRequestFunction)
+     * @see #scrapeWebPage(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<Document> scrapeWebPage(String url) {
         return scrapeWebPage(url, null);
     }
 
+    /**
+     *
+     * @param url
+     * @param pendingBuilder
+     * @return
+     *
+     * @see #scrapeWebPage(String)
+     * @see #scrapeWebPage(String, PendingRequestFunction)
+     * @see #scrapeWebPage(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<Document> scrapeWebPage(String url, @Nullable PendingRequestFunction pendingBuilder) {
         return scrapeWebPage(url, pendingBuilder, null);
     }
 
+    /**
+     *
+     * @param url
+     * @param pendingBuilder
+     * @param requestBuilder
+     * @return
+     *
+     * @see #scrapeWebPage(String)
+     * @see #scrapeWebPage(String, PendingRequestFunction)
+     * @see #scrapeWebPage(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<Document> scrapeWebPage(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
         final Request.Builder builder = prepareGet(url, ContentType.TEXT_HTML);
         final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
@@ -148,14 +178,44 @@ public final class WebUtils extends Reliqua {
         );
     }
 
+    /**
+     *
+     * @param url
+     * @return
+     *
+     * @see #getJSONObject(String)
+     * @see #getJSONObject(String, PendingRequestFunction)
+     * @see #getJSONObject(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<ObjectNode> getJSONObject(String url) {
         return getJSONObject(url, null);
     }
 
+    /**
+     *
+     * @param url
+     * @param pendingBuilder
+     * @return
+     *
+     * @see #getJSONObject(String)
+     * @see #getJSONObject(String, PendingRequestFunction)
+     * @see #getJSONObject(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<ObjectNode> getJSONObject(String url, @Nullable PendingRequestFunction pendingBuilder) {
         return getJSONObject(url, pendingBuilder, null);
     }
 
+    /**
+     *
+     * @param url
+     * @param pendingBuilder
+     * @param requestBuilder
+     * @return
+     *
+     * @see #getJSONObject(String)
+     * @see #getJSONObject(String, PendingRequestFunction)
+     * @see #getJSONObject(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<ObjectNode> getJSONObject(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
         final Request.Builder builder = prepareGet(url, ContentType.JSON);
         final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
@@ -166,14 +226,44 @@ public final class WebUtils extends Reliqua {
         );
     }
 
+    /**
+     *
+     * @param url
+     * @return
+     *
+     * @see #getJSONArray(String)
+     * @see #getJSONArray(String, PendingRequestFunction)
+     * @see #getJSONArray(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<ArrayNode> getJSONArray(String url) {
         return getJSONArray(url, null);
     }
 
+    /**
+     *
+     * @param url
+     * @param pendingBuilder
+     * @return
+     *
+     * @see #getJSONArray(String)
+     * @see #getJSONArray(String, PendingRequestFunction)
+     * @see #getJSONArray(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<ArrayNode> getJSONArray(String url, @Nullable PendingRequestFunction pendingBuilder) {
         return getJSONArray(url, pendingBuilder, null);
     }
 
+    /**
+     *
+     * @param url
+     * @param pendingBuilder
+     * @param requestBuilder
+     * @return
+     *
+     * @see #getJSONArray(String)
+     * @see #getJSONArray(String, PendingRequestFunction)
+     * @see #getJSONArray(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<ArrayNode> getJSONArray(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
         final Request.Builder builder = prepareGet(url, ContentType.JSON);
         final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
@@ -184,14 +274,44 @@ public final class WebUtils extends Reliqua {
         );
     }
 
+    /**
+     *
+     * @param url
+     * @return
+     *
+     * @see #getInputStream(String)
+     * @see #getInputStream(String, PendingRequestFunction)
+     * @see #getInputStream(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<InputStream> getInputStream(String url) {
         return getInputStream(url, null);
     }
 
+    /**
+     *
+     * @param url
+     * @param pendingBuilder
+     * @return
+     *
+     * @see #getInputStream(String)
+     * @see #getInputStream(String, PendingRequestFunction)
+     * @see #getInputStream(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<InputStream> getInputStream(String url, @Nullable PendingRequestFunction pendingBuilder) {
         return getInputStream(url, pendingBuilder, null);
     }
 
+    /**
+     *
+     * @param url
+     * @param pendingBuilder
+     * @param requestBuilder
+     * @return
+     *
+     * @see #getInputStream(String)
+     * @see #getInputStream(String, PendingRequestFunction)
+     * @see #getInputStream(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<InputStream> getInputStream(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
         final Request.Builder builder = prepareGet(url);
         final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
@@ -202,14 +322,44 @@ public final class WebUtils extends Reliqua {
         );
     }
 
+    /**
+     *
+     * @param url
+     * @return
+     *
+     * @see #getByteStream(String)
+     * @see #getByteStream(String, PendingRequestFunction)
+     * @see #getByteStream(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<byte[]> getByteStream(String url) {
         return getByteStream(url, null);
     }
 
+    /**
+     *
+     * @param url
+     * @param pendingBuilder
+     * @return
+     *
+     * @see #getByteStream(String)
+     * @see #getByteStream(String, PendingRequestFunction)
+     * @see #getByteStream(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<byte[]> getByteStream(String url, @Nullable PendingRequestFunction pendingBuilder) {
         return getByteStream(url, pendingBuilder, null);
     }
 
+    /**
+     *
+     * @param url
+     * @param pendingBuilder
+     * @param requestBuilder
+     * @return
+     *
+     * @see #getByteStream(String)
+     * @see #getByteStream(String, PendingRequestFunction)
+     * @see #getByteStream(String, PendingRequestFunction, RequestBuilderFunction)
+     */
     public PendingRequest<byte[]> getByteStream(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
         final Request.Builder builder = prepareGet(url);
         final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
@@ -220,10 +370,21 @@ public final class WebUtils extends Reliqua {
         );
     }
 
+    /**
+     *
+     * @param url
+     * @return
+     */
     public Request.Builder prepareGet(String url) {
         return prepareGet(url, ContentType.ANY);
     }
 
+    /**
+     *
+     * @param url
+     * @param accept
+     * @return
+     */
     public Request.Builder prepareGet(String url, ContentType accept) {
         return
             defaultRequest()
@@ -231,6 +392,12 @@ public final class WebUtils extends Reliqua {
                 .addHeader("Accept", accept.getType());
     }
 
+    /**
+     *
+     * @param url
+     * @param body
+     * @return
+     */
     public PendingRequestBuilder postRequest(String url, IRequestBody body) {
         return createRequest(
             defaultRequest()
@@ -240,6 +407,13 @@ public final class WebUtils extends Reliqua {
         );
     }
 
+    /**
+     *
+     * @param sourceLang
+     * @param targetLang
+     * @param input
+     * @return
+     */
     public ArrayNode translate(String sourceLang, String targetLang, String input) {
         return (ArrayNode) getJSONArray(
             "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sourceLang + "&tl=" + targetLang + "&dt=t&q=" + input
@@ -249,6 +423,14 @@ public final class WebUtils extends Reliqua {
             .get(0);
     }
 
+    /**
+     *
+     * @param url
+     * @param domain
+     * @param apiKey
+     * @param linkLength
+     * @return
+     */
     public PendingRequest<String> shortenUrl(String url, String domain, String apiKey, GoogleLinkLength linkLength) {
         final ObjectNode json = mapper.createObjectNode();
 
@@ -278,6 +460,13 @@ public final class WebUtils extends Reliqua {
         }
     }
 
+    /**
+     *
+     * @param request
+     * @param mapper
+     * @param <T>
+     * @return
+     */
     public <T> PendingRequest<T> prepareRaw(Request request, ResponseMapper<T> mapper) {
         return createRequest(request).build(mapper, WebParserUtils::handleError);
     }
@@ -296,14 +485,26 @@ public final class WebUtils extends Reliqua {
         return pendingRequestBuilder;
     }
 
+    /**
+     *
+     * @return
+     */
     public static String getUserAgent() {
         return USER_AGENT;
     }
 
+    /**
+     *
+     * @param userAgent
+     */
     public static void setUserAgent(String userAgent) {
         USER_AGENT = userAgent;
     }
 
+    /**
+     *
+     * @return
+     */
     public static Request.Builder defaultRequest() {
         return new Request.Builder()
             .get()
@@ -311,6 +512,11 @@ public final class WebUtils extends Reliqua {
             .addHeader("cache-control", "no-cache");
     }
 
+    /**
+     *
+     * @param input
+     * @return
+     */
     public static String urlEncodeString(String input) {
         try {
             return URLEncoder.encode(input, "UTF-8");
