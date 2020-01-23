@@ -34,13 +34,13 @@ import okhttp3.Request;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import javax.annotation.Nullable;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
 
 import static me.duncte123.botcommons.web.WebParserUtils.toJSONObject;
-
 
 @SuppressWarnings({"unused", "WeakerAccess", "ConstantConditions"})
 public final class WebUtils extends Reliqua {
@@ -61,100 +61,137 @@ public final class WebUtils extends Reliqua {
         );
     }
 
+    /**
+     * Retrieves text from a webpage
+     *
+     * @param url
+     *     The url to retrieve the text from
+     *
+     * @return A {@link PendingRequest PendingRequest} that is pending execution via {@link PendingRequest#async()
+     * PendingRequest#async()}, {@link PendingRequest#submit() PendingRequest#submit()} or {@link
+     * PendingRequest#execute() PendingRequest#execute()}
+     *
+     * @see #getText(String, PendingRequestFunction)
+     * @see #getText(String, PendingRequestFunction, RequestBuilderFunction)
+     * @see PendingRequest
+     */
     public PendingRequest<String> getText(String url) {
-        return getText(url, (f) -> f);
+        return getText(url, null);
     }
 
-    public PendingRequest<String> getText(String url, PendingRequestFunction fn) {
-        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url);
+    public PendingRequest<String> getText(String url, @Nullable PendingRequestFunction pendingBuilder) {
+        return getText(url, pendingBuilder, null);
+    }
 
-        return fn.apply(pendingRequestBuilder)
-            .build(
-                (response) -> response.body().string(),
-                WebParserUtils::handleError
-            );
+    public PendingRequest<String> getText(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
+        final Request.Builder builder = prepareGet(url);
+        final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
+
+        return pendingRequestBuilder.build(
+            (response) -> response.body().string(),
+            WebParserUtils::handleError
+        );
     }
 
     public PendingRequest<Document> scrapeWebPage(String url) {
-        return scrapeWebPage(url, (f) -> f);
+        return scrapeWebPage(url, null);
     }
 
-    public PendingRequest<Document> scrapeWebPage(String url, PendingRequestFunction fn) {
-        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url, ContentType.TEXT_HTML);
+    public PendingRequest<Document> scrapeWebPage(String url, @Nullable PendingRequestFunction pendingBuilder) {
+        return scrapeWebPage(url, pendingBuilder, null);
+    }
 
-        return fn.apply(pendingRequestBuilder)
-            .build(
-                (response) -> Jsoup.parse(response.body().string()),
-                WebParserUtils::handleError
-            );
+    public PendingRequest<Document> scrapeWebPage(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
+        final Request.Builder builder = prepareGet(url, ContentType.TEXT_HTML);
+        final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
+
+        return pendingRequestBuilder.build(
+            (response) -> Jsoup.parse(response.body().string()),
+            WebParserUtils::handleError
+        );
     }
 
     public PendingRequest<ObjectNode> getJSONObject(String url) {
-        return getJSONObject(url, (f) -> f);
+        return getJSONObject(url, null);
     }
 
-    public PendingRequest<ObjectNode> getJSONObject(String url, PendingRequestFunction fn) {
-        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url, ContentType.JSON);
+    public PendingRequest<ObjectNode> getJSONObject(String url, @Nullable PendingRequestFunction pendingBuilder) {
+        return getJSONObject(url, pendingBuilder, null);
+    }
 
-        return fn.apply(pendingRequestBuilder)
-            .build(
-                (res) -> WebParserUtils.toJSONObject(res, mapper),
-                WebParserUtils::handleError
-            );
+    public PendingRequest<ObjectNode> getJSONObject(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
+        final Request.Builder builder = prepareGet(url, ContentType.JSON);
+        final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
+
+        return pendingRequestBuilder.build(
+            (res) -> WebParserUtils.toJSONObject(res, mapper),
+            WebParserUtils::handleError
+        );
     }
 
     public PendingRequest<ArrayNode> getJSONArray(String url) {
-        return getJSONArray(url, (f) -> f);
+        return getJSONArray(url, null);
     }
 
-    public PendingRequest<ArrayNode> getJSONArray(String url, PendingRequestFunction fn) {
-        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url, ContentType.JSON);
+    public PendingRequest<ArrayNode> getJSONArray(String url, @Nullable PendingRequestFunction pendingBuilder) {
+        return getJSONArray(url, pendingBuilder, null);
+    }
 
-        return fn.apply(pendingRequestBuilder)
-            .build(
-                (res) -> (ArrayNode) mapper.readTree(WebParserUtils.getInputStream(res)),
-                WebParserUtils::handleError
-            );
+    public PendingRequest<ArrayNode> getJSONArray(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
+        final Request.Builder builder = prepareGet(url, ContentType.JSON);
+        final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
+
+        return pendingRequestBuilder.build(
+            (res) -> (ArrayNode) mapper.readTree(WebParserUtils.getInputStream(res)),
+            WebParserUtils::handleError
+        );
     }
 
     public PendingRequest<InputStream> getInputStream(String url) {
-        return getInputStream(url, (f) -> f);
+        return getInputStream(url, null);
     }
 
-    public PendingRequest<InputStream> getInputStream(String url, PendingRequestFunction fn) {
-        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url);
+    public PendingRequest<InputStream> getInputStream(String url, @Nullable PendingRequestFunction pendingBuilder) {
+        return getInputStream(url, pendingBuilder, null);
+    }
 
-        return fn.apply(pendingRequestBuilder)
-            .build(
-                WebParserUtils::getInputStream,
-                WebParserUtils::handleError
-            );
+    public PendingRequest<InputStream> getInputStream(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
+        final Request.Builder builder = prepareGet(url);
+        final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
+
+        return pendingRequestBuilder.build(
+            WebParserUtils::getInputStream,
+            WebParserUtils::handleError
+        );
     }
 
     public PendingRequest<byte[]> getByteStream(String url) {
-        return getByteStream(url, (f) -> f);
+        return getByteStream(url, null);
     }
 
-    public PendingRequest<byte[]> getByteStream(String url, PendingRequestFunction fn) {
-        final PendingRequestBuilder pendingRequestBuilder = prepareGet(url);
-
-        return fn.apply(pendingRequestBuilder)
-            .build(
-                (res) -> IOUtil.readFully(WebParserUtils.getInputStream(res)),
-                WebParserUtils::handleError
-            );
+    public PendingRequest<byte[]> getByteStream(String url, @Nullable PendingRequestFunction pendingBuilder) {
+        return getByteStream(url, pendingBuilder, null);
     }
 
-    public PendingRequestBuilder prepareGet(String url) {
+    public PendingRequest<byte[]> getByteStream(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
+        final Request.Builder builder = prepareGet(url);
+        final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
+
+        return pendingRequestBuilder.build(
+            (res) -> IOUtil.readFully(WebParserUtils.getInputStream(res)),
+            WebParserUtils::handleError
+        );
+    }
+
+    public Request.Builder prepareGet(String url) {
         return prepareGet(url, ContentType.ANY);
     }
 
-    public PendingRequestBuilder prepareGet(String url, ContentType accept) {
-        return createRequest(
+    public Request.Builder prepareGet(String url, ContentType accept) {
+        return
             defaultRequest()
                 .url(url)
-                .addHeader("Accept", accept.getType())
-        );
+                .addHeader("Accept", accept.getType());
     }
 
     public PendingRequestBuilder postRequest(String url, IRequestBody body) {
@@ -206,6 +243,20 @@ public final class WebUtils extends Reliqua {
 
     public <T> PendingRequest<T> prepareRaw(Request request, ResponseMapper<T> mapper) {
         return createRequest(request).build(mapper, WebParserUtils::handleError);
+    }
+
+    private PendingRequestBuilder applyFunctions(Request.Builder builder, @Nullable PendingRequestFunction fn1, @Nullable RequestBuilderFunction fn2) {
+        if (fn2 != null) {
+            builder = fn2.apply(builder);
+        }
+
+        PendingRequestBuilder pendingRequestBuilder = createRequest(builder);
+
+        if (fn1 != null) {
+            pendingRequestBuilder = fn1.apply(pendingRequestBuilder);
+        }
+
+        return pendingRequestBuilder;
     }
 
     public static String getUserAgent() {
