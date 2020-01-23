@@ -79,10 +79,47 @@ public final class WebUtils extends Reliqua {
         return getText(url, null);
     }
 
+    /**
+     * Retrieves text from a webpage
+     *
+     * @param url
+     *     The url to retrieve the text from
+     * @param pendingBuilder
+     *     Used {@link PendingRequestBuilder PendingRequestBuilder} to add extra configuration to the {@link
+     *     PendingRequest PendingRequest} returned
+     *
+     * @return A {@link PendingRequest PendingRequest} that is pending execution via {@link PendingRequest#async()
+     * PendingRequest#async()}, {@link PendingRequest#submit() PendingRequest#submit()} or {@link
+     * PendingRequest#execute() PendingRequest#execute()}
+     *
+     * @see #getText(String)
+     * @see #getText(String, PendingRequestFunction, RequestBuilderFunction)
+     * @see PendingRequest
+     */
     public PendingRequest<String> getText(String url, @Nullable PendingRequestFunction pendingBuilder) {
         return getText(url, pendingBuilder, null);
     }
 
+
+    /**
+     * Retrieves text from a webpage
+     *
+     * @param url
+     *     The url to retrieve the text from
+     * @param pendingBuilder
+     *     Used {@link PendingRequestBuilder PendingRequestBuilder} to add extra configuration to the {@link
+     *     PendingRequest PendingRequest} returned
+     * @param requestBuilder
+     *     Used to configure the {@link Request Request} before it is send off to the server
+     *
+     * @return A {@link PendingRequest PendingRequest} that is pending execution via {@link PendingRequest#async()
+     * PendingRequest#async()}, {@link PendingRequest#submit() PendingRequest#submit()} or {@link
+     * PendingRequest#execute() PendingRequest#execute()}
+     *
+     * @see #getText(String)
+     * @see #getText(String, PendingRequestFunction)
+     * @see PendingRequest
+     */
     public PendingRequest<String> getText(String url, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
         final Request.Builder builder = prepareGet(url);
         final PendingRequestBuilder pendingRequestBuilder = applyFunctions(builder, pendingBuilder, requestBuilder);
