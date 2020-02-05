@@ -80,4 +80,18 @@ public class StringUtils {
         return string.substring(0, maxLength - markerLength) + marker;
     }
 
+    public static String capitalizeFully(String str) {
+        Checks.notBlank(str, "str");
+
+        final String[] words = str.toLowerCase().split("\\s+");
+        final StringBuilder builder = new StringBuilder();
+
+        for (String word : words) {
+            builder.append(Character.toUpperCase(word.charAt(0)))
+                .append(word.substring(1));
+        }
+
+        return builder.toString();
+    }
+
 }
