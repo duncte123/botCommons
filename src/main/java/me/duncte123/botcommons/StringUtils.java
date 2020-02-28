@@ -67,7 +67,12 @@ public class StringUtils {
      *     when the string is blank or null or when maxLength is less than 0
      */
     public static String abbreviate(String string, int maxLength) {
-        Checks.notBlank(string, "string");
+        Checks.notNull(string, "string");
+
+        if (string.isEmpty()) {
+            return "";
+        }
+
         Checks.positive(maxLength, "maxLength");
 
         final String marker = "...";
