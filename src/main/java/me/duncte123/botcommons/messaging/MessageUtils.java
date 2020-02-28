@@ -628,6 +628,7 @@ public class MessageUtils {
         if ((channel != null && channel.getGuild().getTextChannelById(channel.getId()) != null) &&
             Objects.requireNonNull(channel.getGuild().getTextChannelById(channel.getId())).canTalk()) {
             final MessageBuilder builder = new MessageBuilder(msg.getContentRaw());
+            builder.setNonce("dunctebot_" + channel.getId() + System.currentTimeMillis());
 
             if (!msg.getEmbeds().isEmpty()) {
                 if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
