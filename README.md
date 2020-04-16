@@ -5,6 +5,15 @@ A set of tools for the [JDA] library
 ## Adding to your project
 The current latest version is: [ ![version][] ][download]
 
+## Usage
+
+Usage instructions can be found [here][usage]
+
+## Bot not shutting down?
+A shutdown method was created in the `BotCommons` class. <br>
+This method also accepts your JDA or ShardManager instance for killing the threads that OkHttp created, because of these running threads your bot will not shut down.
+
+
 #### With gradle
 
 ```GRADLE
@@ -23,26 +32,17 @@ dependencies {
 <repository>
     <id>jcenter</id>
     <name>jcenter-bintray</name>
-    <url>http://jcenter.bintray.com</url>
+    <url>https://jcenter.bintray.com</url>
 </repository>
 
 <dependency>
   <groupId>me.duncte123</groupId>
   <artifactId>botCommons</artifactId>
   <version>[VERSION]</version>
-  <type>pom</type>
 </dependency>
 ```
 
 Make sure to replace `[VERSION]` with the version listed above.
-
-## Usage
-
-Usage instructions can be found [here][usage]
-
-## Bot not shutting down?
-A shutdown method was created in the `BotCommons` class. <br>
-This method also accepts your JDA or ShardManager instance for killing the threads that OkHttp created, because of these running threads your bot will not shut down.
 
 [JDA]: https://github.com/DV8FromTheWorld/JDA
 [version]: https://api.bintray.com/packages/duncte123/maven/botcommons/images/download.svg

@@ -81,7 +81,7 @@ class WebUtilsJsonExample {
         // Or use the IRequestBody interface to write your own
         JSONRequestBody body = JSONRequestBody.fromDataObject(data);
         
-        WebUtils.ins.postRequest("https://example.com/json-post-request", body).async(
+        WebUtils.ins.postRequest("https://httpbin.org/post", body).async(
             (json) -> System.out.println(json) // Do something with the result
         );
     }
