@@ -31,13 +31,14 @@ import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
-@SuppressWarnings("WeakerAccess")
 public class WebParserUtils {
+    // Only null when invalid json is found
     @Nullable
     public static ObjectNode toJSONObject(Response response) throws IOException {
         return toJSONObject(response, JSONHelper.createObjectMapper());
     }
 
+    // Only null when invalid json is found
     @Nullable
     public static ObjectNode toJSONObject(Response response, ObjectMapper mapper) throws IOException {
         return (ObjectNode) mapper.readTree(getInputStream(response));

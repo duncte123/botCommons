@@ -16,7 +16,6 @@
 
 package me.duncte123.botcommons.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,7 +26,6 @@ import com.github.natanbc.reliqua.util.ResponseMapper;
 import me.duncte123.botcommons.BotCommons;
 import me.duncte123.botcommons.JSONHelper;
 import me.duncte123.botcommons.web.requests.IRequestBody;
-import me.duncte123.botcommons.web.requests.JSONRequestBody;
 import net.dv8tion.jda.internal.utils.IOUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -39,8 +37,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
-
-import static me.duncte123.botcommons.web.WebParserUtils.toJSONObject;
 
 @SuppressWarnings({"unused", "WeakerAccess", "ConstantConditions"})
 public final class WebUtils extends Reliqua {
@@ -421,43 +417,6 @@ public final class WebUtils extends Reliqua {
             .execute()
             .get(0)
             .get(0);
-    }
-
-    /**
-     *
-     * @param url
-     * @param domain
-     * @param apiKey
-     * @param linkLength
-     * @return
-     */
-    public PendingRequest<String> shortenUrl(String url, String domain, String apiKey, GoogleLinkLength linkLength) {
-        final ObjectNode json = mapper.createObjectNode();
-
-        json.set("dynamicLinkInfo",
-            mapper.createObjectNode()
-                .put("domainUriPrefix", domain)
-                .put("link", url)
-        );
-        json.set("suffix",
-            mapper.createObjectNode()
-                .put("option", linkLength.name())
-        );
-
-        try {
-            return postRequest(
-                "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=" + apiKey,
-                JSONRequestBody.fromJackson(json)
-            )
-                .build(
-                    (r) -> toJSONObject(r, mapper).get("shortLink").asText(),
-                    WebParserUtils::handleError
-                );
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-
-            return null;
-        }
     }
 
     /**
