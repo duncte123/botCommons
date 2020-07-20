@@ -32,6 +32,7 @@ public class EmbedUtils {
 
     private static Supplier<EmbedBuilder> embedBuilderSupplier = EmbedBuilder::new;
     static final TLongIntMap customColors = new TLongIntHashMap();
+    private static int defaultColor = 0xFF00FF;
 
     /**
      * Sets the embed builder for the util method
@@ -41,18 +42,6 @@ public class EmbedUtils {
      */
     public static void setEmbedBuilder(Supplier<EmbedBuilder> embedBuilderSupplier) {
         EmbedUtils.embedBuilderSupplier = embedBuilderSupplier;
-    }
-
-    /**
-     * Adds a color for a guild id
-     *
-     * @param key
-     *         the guild id
-     * @param value
-     *         the color for this guild
-     */
-    public static void addColor(long key, @NotNull Color value) {
-        customColors.put(key, value.getRGB());
     }
 
     /**
@@ -94,13 +83,22 @@ public class EmbedUtils {
      *
      * @param key
      *         the id to find the color for
-     * @param color
-     *         the default value for the key
      *
      * @return The color for this key or the default value
+     *
+     * @see #setDefaultColor(int)
+     * @see #getDefaultColor()
      */
-    public static int getColorOrDefault(long key, int color) {
-        return customColors.containsKey(key) ? customColors.get(key) : color;
+    public static int getColorOrDefault(long key) {
+        return customColors.containsKey(key) ? customColors.get(key) : defaultColor;
+    }
+
+    public static void setDefaultColor(int defaultColor) {
+        EmbedUtils.defaultColor = defaultColor;
+    }
+
+    public static int getDefaultColor() {
+        return defaultColor;
     }
 
     /**

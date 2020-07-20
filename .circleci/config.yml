@@ -74,7 +74,7 @@ jobs:
                   name: "Upload if on master"
                   command: ./gradlew bintrayUpload;
 
-    deploy_v4:
+    deploy_beta:
         docker:
             # specify the version you desire here
             - image: circleci/openjdk:8-jdk
@@ -90,7 +90,7 @@ jobs:
             # Customize the JVM maximum heap limit
             JVM_OPTS: -Xmx3200m
             TERM: dumb
-            VERSION_PREFIX: "JDA_4_"
+            VERSION_PREFIX: "BETA_"
 
         steps:
             - attach_workspace:
@@ -112,9 +112,9 @@ workflows:
                   filters:
                       branches:
                           only: master
-#            - deploy_v4:
-#                  requires:
-#                      - build
-#                  filters:
-#                      branches:
-#                          only: jda-v4
+            - deploy_beta:
+                  requires:
+                      - build
+                  filters:
+                      branches:
+                          only: beta

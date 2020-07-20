@@ -25,7 +25,7 @@ plugins {
 
 group = 'me.duncte123'
 archivesBaseName = 'botCommons'
-version = getVersionPrefix() + '1.0.' + getBuildNum()
+version = getVersionPrefix() + '2.0.' + getBuildNum()
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -44,10 +44,10 @@ dependencies {
     api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.1'
     
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
-    api group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
+    api group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     
     // https://bintray.com/bintray/jcenter/com.squareup.okhttp3:okhttp
-    api group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.14.4'
+    api group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.14.9'
     
     // https://bintray.com/natanbc/maven/reliqua/
     api(group: 'me.duncte123', name: 'reliqua', version: '2.4.8') {
@@ -59,11 +59,11 @@ dependencies {
     // https://mvnrepository.com/artifact/org.json/json
     compileOnly group: 'org.json', name: 'json', version: '20180813' // Provided by the user
 
-    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.1.1_153') {
+    compileOnly (group: 'net.dv8tion', name: 'JDA', version: '4.2.0_180') {
         exclude module: 'opus-java'
     }
 
-    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.1.1_153') {
+    testImplementation (group: 'net.dv8tion', name: 'JDA', version: '4.2.0_180') {
         exclude module: 'opus-java'
     }
 
@@ -178,6 +178,10 @@ build {
     javadocJar.mustRunAfter jar
     sourcesJar.mustRunAfter javadocJar
     publish.mustRunAfter sourcesJar
+}
+
+wrapper {
+    gradleVersion = '6.5'
 }
 
 static def getVersionPrefix() {

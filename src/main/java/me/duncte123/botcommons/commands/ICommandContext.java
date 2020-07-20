@@ -31,7 +31,9 @@ public interface ICommandContext {
      *
      * @return the {@link net.dv8tion.jda.api.entities.Guild} for this command/event
      */
-    Guild getGuild();
+    default Guild getGuild() {
+        return this.getEvent().getGuild();
+    }
 
     /**
      * Returns the {@link net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent message event} that was received for this instance

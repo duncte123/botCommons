@@ -1,4 +1,4 @@
-git checkout master
+git checkout beta
 git pull
 git merge develop
 git push
