@@ -85,6 +85,11 @@ public class StringUtils {
         return string.substring(0, maxLength - markerLength) + marker;
     }
 
+    /**
+     *
+     * @param str
+     * @return
+     */
     public static String capitalizeFully(String str) {
         Checks.notBlank(str, "str");
 
