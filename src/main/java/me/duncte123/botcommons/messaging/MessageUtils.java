@@ -16,6 +16,7 @@
 
 package me.duncte123.botcommons.messaging;
 
+import me.duncte123.botcommons.commands.ICommandContext;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.MessageBuilder.SplitPolicy;
@@ -143,6 +144,26 @@ public class MessageUtils {
         }
 
         message.editMessage(newContent).queue();
+    }
+
+    public static void sendEmbed(ICommandContext ctx, EmbedBuilder embed) {
+        sendEmbed(ctx, embed, false);
+    }
+
+    public static void sendEmbed(ICommandContext ctx, EmbedBuilder embed, boolean raw) {
+        sendMsg(
+            MessageConfig.Builder.fromCtx(ctx)
+                .setEmbed(embed, raw)
+                .build()
+        );
+    }
+
+    public static void sendMsg(ICommandContext ctx, String message) {
+        sendMsg(
+            MessageConfig.Builder.fromCtx(ctx)
+                .setMessage(message)
+                .build()
+        );
     }
 
     public static void sendMsg(MessageConfig.Builder builder) {
