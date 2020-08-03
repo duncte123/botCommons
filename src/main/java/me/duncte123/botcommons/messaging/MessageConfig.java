@@ -46,6 +46,18 @@ public class MessageConfig {
     private final Consumer<? super Message> successAction;
     private final Consumer<MessageAction> actionConfig;
 
+    /**
+     * Constructs a new instacne of the message config, it is better to use the {@link Builder builder}
+     *
+     * @param channel The text channel that the message will be sent to
+     * @param messageBuilder The message builder that holds the content for the message
+     * @param embed An optional embed to send with the message
+     * @param failureAction The action that will be invoked when the message sending fails
+     * @param successAction The action that will be called when the message sending succeeds
+     * @param actionConfig Gets called before the message is sent, allows for more configuration on the message action
+     *
+     * @see Builder
+     */
     public MessageConfig(TextChannel channel, MessageBuilder messageBuilder, EmbedBuilder embed, Consumer<? super Throwable> failureAction,
                          Consumer<? super Message> successAction, Consumer<MessageAction> actionConfig) {
 
@@ -64,45 +76,86 @@ public class MessageConfig {
         this.messageBuilder.setNonce(nonceSupplier.apply(channel));
     }
 
+    /**
+     * Returns the text channel that the message will be sent in
+     *
+     * @return The text channel that the message will be sent in
+     */
     public TextChannel getChannel() {
-        return channel;
+        return this.channel;
     }
 
+    /**
+     * Returns the message builder that holds the contents for the message<br/>
+     * The reason that we are using a message builder is so that we can easily attach the embed and set the nonce
+     *
+     * @return The message builder that holds the contents for the message
+     */
     public MessageBuilder getMessageBuilder() {
-        return messageBuilder;
+        return this.messageBuilder;
     }
 
+    /**
+     * Returns the embed that should go under the message
+     *
+     * @return A possibly null embed that should go under the message
+     */
+    @Nullable
     public EmbedBuilder getEmbed() {
-        return embed;
+        return this.embed;
     }
 
+    /**
+     *
+     * @return
+     */
     public Consumer<? super Throwable> getFailureAction() {
-        return failureAction;
+        return this.failureAction;
     }
 
+    /**
+     *
+     * @return
+     */
     public Consumer<? super Message> getSuccessAction() {
-        return successAction;
+        return this.successAction;
     }
 
+    /**
+     *
+     * @return
+     */
     public Consumer<MessageAction> getActionConfig() {
-        return actionConfig;
+        return this.actionConfig;
     }
 
+    /**
+     *
+     * @param nonceSupplier
+     */
     public static void setNonceSupplier(Function<TextChannel, String> nonceSupplier) {
         Checks.notNull(nonceSupplier, "nonceSupplier");
 
         MessageConfig.nonceSupplier = nonceSupplier;
     }
 
+    /**
+     * Builder class for the message config
+     */
     public static class Builder {
         private TextChannel channel;
-        private MessageBuilder messageBuilder;
+        private final MessageBuilder messageBuilder = new MessageBuilder();
         private EmbedBuilder embed;
 
         private Consumer<? super Throwable> failureAction = RestAction.getDefaultFailure();
         private Consumer<? super Message> successAction = RestAction.getDefaultSuccess();
         private Consumer<MessageAction> actionConfig = (a) -> {};
 
+        /**
+         *
+         * @param channel
+         * @return
+         */
         public Builder setChannel(@Nonnull TextChannel channel) {
             Checks.notNull(channel, "channel");
 
@@ -110,21 +163,43 @@ public class MessageConfig {
             return this;
         }
 
+        /**
+         *
+         * @param message
+         * @return
+         */
         public Builder setMessage(Message message) {
-            this.messageBuilder = new MessageBuilder(message);
+            this.messageBuilder.setContent(message.getContentRaw());
             return this;
         }
 
+        /**
+         *
+         * @param message
+         * @return
+         */
         public Builder setMessage(String message) {
-            this.messageBuilder = new MessageBuilder().append(StringUtils.abbreviate(message, Message.MAX_CONTENT_LENGTH));
+            this.messageBuilder.setContent(StringUtils.abbreviate(message, Message.MAX_CONTENT_LENGTH));
             return this;
         }
 
+        /**
+         *
+         * @param message
+         * @param args
+         * @return
+         */
         public Builder setMessageFormat(String message, Object... args) {
-            this.messageBuilder = new MessageBuilder().appendFormat(message, args);
+            this.messageBuilder.setContent(String.format(message, args));
             return this;
         }
 
+        /**
+         *
+         * @param embed
+         * @return
+         * @deprecated Use the method that takes in an embed builder instead
+         */
         @Deprecated
         @ForRemoval(deadline = "2.0.1")
         public Builder setEmbed(MessageEmbed embed) {
@@ -140,10 +215,21 @@ public class MessageConfig {
             return this;
         }
 
+        /**
+         *
+         * @param embed
+         * @return
+         */
         public Builder setEmbed(@Nullable EmbedBuilder embed) {
             return this.setEmbed(embed, false);
         }
 
+        /**
+         *
+         * @param embed
+         * @param raw
+         * @return
+         */
         public Builder setEmbed(@Nullable EmbedBuilder embed, boolean raw) {
             // Use raw to skip this parsing
             if (embed != null && !raw) {
@@ -159,20 +245,39 @@ public class MessageConfig {
             return this;
         }
 
+        /**
+         *
+         * @return
+         */
         public MessageBuilder getMessageBuilder() {
             return messageBuilder;
         }
 
+        /**
+         *
+         * @param failureAction
+         * @return
+         */
         public Builder setFailureAction(Consumer<? super Throwable> failureAction) {
             this.failureAction = failureAction;
             return this;
         }
 
+        /**
+         *
+         * @param successAction
+         * @return
+         */
         public Builder setSuccessAction(Consumer<? super Message> successAction) {
             this.successAction = successAction;
             return this;
         }
 
+        /**
+         *
+         * @param actionConfig
+         * @return
+         */
         public Builder setActionConfig(@Nonnull Consumer<MessageAction> actionConfig) {
             Checks.notNull(actionConfig, "actionConfig");
 
@@ -180,9 +285,19 @@ public class MessageConfig {
             return this;
         }
 
+        /**
+         * Builds the message config and returns it
+         *
+         * @return a message config instance
+         */
         public MessageConfig build() {
             if (this.channel == null) {
                 throw new IllegalArgumentException("No text channel has been set, set this with setChannel");
+            }
+
+            // we can send messages with just an embed
+            if (this.messageBuilder.isEmpty() && this.embed == null) {
+                throw new IllegalArgumentException("This message has no content, please add some content with setMessage or setEmbed");
             }
 
             return new MessageConfig(
@@ -195,10 +310,26 @@ public class MessageConfig {
             );
         }
 
+        /**
+         * Creates a config builder instance from a command context
+         *
+         * @param ctx a command context instance to get the text channel from
+         *
+         * @return A builder instance that was created from a command context
+         *
+         * @see me.duncte123.botcommons.commands.DefaultCommandContext
+         */
         public static Builder fromCtx(ICommandContext ctx) {
             return new Builder().setChannel(ctx.getChannel());
         }
 
+        /**
+         * Creates a config builder instance from a JDA guild message received event
+         *
+         * @param event A {@link GuildMessageReceivedEvent} from JDA to get the text channel from
+         *
+         * @return A builder instance that was created from a {@link GuildMessageReceivedEvent}
+         */
         public static Builder fromEvent(GuildMessageReceivedEvent event) {
             return new Builder().setChannel(event.getChannel());
         }

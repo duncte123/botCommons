@@ -124,6 +124,11 @@ public class MessageUtils {
         );
     }
 
+    /**
+     *
+     * @param message
+     * @param newContent
+     */
     public static void editMsg(Message message, Message newContent) {
         if (message == null || newContent == null) return;
         if (newContent.getEmbeds().size() > 0) {
@@ -146,10 +151,21 @@ public class MessageUtils {
         message.editMessage(newContent).queue();
     }
 
+    /**
+     *
+     * @param ctx
+     * @param embed
+     */
     public static void sendEmbed(ICommandContext ctx, EmbedBuilder embed) {
         sendEmbed(ctx, embed, false);
     }
 
+    /**
+     *
+     * @param ctx
+     * @param embed
+     * @param raw
+     */
     public static void sendEmbed(ICommandContext ctx, EmbedBuilder embed, boolean raw) {
         sendMsg(
             MessageConfig.Builder.fromCtx(ctx)
@@ -158,6 +174,11 @@ public class MessageUtils {
         );
     }
 
+    /**
+     *
+     * @param ctx
+     * @param message
+     */
     public static void sendMsg(ICommandContext ctx, String message) {
         sendMsg(
             MessageConfig.Builder.fromCtx(ctx)
@@ -170,6 +191,10 @@ public class MessageUtils {
         sendMsg(builder.build());
     }
 
+    /**
+     *
+     * @param config
+     */
     public static void sendMsg(MessageConfig config) {
         final TextChannel channel = config.getChannel();
         final Guild guild = channel.getGuild();
