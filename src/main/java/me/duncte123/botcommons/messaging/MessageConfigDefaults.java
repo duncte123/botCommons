@@ -16,13 +16,13 @@
 
 package me.duncte123.botcommons.messaging;
 
-import net.dv8tion.jda.api.entities.Message;
-
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class MessageConfigDefaults {
-    public static final BiConsumer<? super Message, Long> DELETE_MESSAGE_AFTER_SECONDS = (message, secs) -> message.delete()
-        .reason("automatic remove")
-        .queueAfter(secs, TimeUnit.SECONDS);
+    public static final Function<Long, MessageConfig.Builder> DELETE_MESSAGE_AFTER_SECONDS = (secs) -> new MessageConfig.Builder().setSuccessAction(
+        (message) -> message.delete()
+            .reason("automatic remove")
+            .queueAfter(secs, TimeUnit.SECONDS)
+    );
 }

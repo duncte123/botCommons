@@ -19,6 +19,7 @@ package me.duncte123.botcommons.messaging;
 import gnu.trove.map.TLongIntMap;
 import me.duncte123.botcommons.StringUtils;
 import me.duncte123.botcommons.commands.ICommandContext;
+import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -125,6 +126,7 @@ public class MessageConfig {
         }
 
         @Deprecated
+        @ForRemoval(deadline = "2.0.1")
         public Builder setEmbed(MessageEmbed embed) {
             TLongIntMap colors = EmbedUtils.customColors;
             long guild = channel.getGuild().getIdLong();
@@ -179,6 +181,10 @@ public class MessageConfig {
         }
 
         public MessageConfig build() {
+            if (this.channel == null) {
+                throw new IllegalArgumentException("No text channel has been set, set this with setChannel");
+            }
+
             return new MessageConfig(
                 this.channel,
                 this.messageBuilder,

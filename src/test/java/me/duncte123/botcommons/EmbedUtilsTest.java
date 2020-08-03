@@ -33,7 +33,7 @@ public class EmbedUtilsTest {
             () -> new EmbedBuilder().setAuthor("test")
         );
 
-        MessageEmbed embedWithCustomAuthor = EmbedUtils.defaultEmbed()
+        MessageEmbed embedWithCustomAuthor = EmbedUtils.getDefaultEmbed()
             .setAuthor("Kaas").setDescription("Hello world2").build();
 
         MessageEmbed normalEmbed = EmbedUtils.embedMessage("Hello World").build();
@@ -49,14 +49,14 @@ public class EmbedUtilsTest {
 
         EmbedUtils.addColor(3L, color);
 
-        MessageEmbed embed = EmbedUtils.defaultEmbed(3L).build();
+        MessageEmbed embed = EmbedUtils.getDefaultEmbed(3L).build();
 
         assertEquals(color, embed.getColorRaw());
     }
 
     @Test
     public void testEmbedColorDefaultsWhenNotSet() {
-        MessageEmbed embed = EmbedUtils.defaultEmbed(3L).build();
+        MessageEmbed embed = EmbedUtils.getDefaultEmbed(3L).build();
 
         assertEquals(Role.DEFAULT_COLOR_RAW, embed.getColorRaw());
     }

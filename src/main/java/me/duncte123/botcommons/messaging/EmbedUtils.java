@@ -20,16 +20,13 @@ import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.function.Supplier;
 
 /**
  * Util class to help send embeds
  */
 public class EmbedUtils {
-
     private static Supplier<EmbedBuilder> embedBuilderSupplier = EmbedBuilder::new;
     static final TLongIntMap customColors = new TLongIntHashMap();
     private static int defaultColor = 0xFF00FF;
@@ -93,10 +90,20 @@ public class EmbedUtils {
         return customColors.containsKey(key) ? customColors.get(key) : defaultColor;
     }
 
+    /**
+     * Sets the default color of all embeds
+     *
+     * @param defaultColor The default color of all embeds
+     */
     public static void setDefaultColor(int defaultColor) {
         EmbedUtils.defaultColor = defaultColor;
     }
 
+    /**
+     * Returns the default color of all embeds
+     *
+     * @return the default color of all embeds
+     */
     public static int getDefaultColor() {
         return defaultColor;
     }
@@ -112,7 +119,7 @@ public class EmbedUtils {
      * @return The {@link EmbedBuilder} for this action
      */
     public static EmbedBuilder embedField(String title, String message) {
-        return defaultEmbed().addField(title, message, false);
+        return getDefaultEmbed().addField(title, message, false);
     }
 
     /**
@@ -124,7 +131,7 @@ public class EmbedUtils {
      * @return The {@link EmbedBuilder} for this action
      */
     public static EmbedBuilder embedMessage(String message) {
-        return defaultEmbed().setDescription(message);
+        return getDefaultEmbed().setDescription(message);
     }
 
     /**
@@ -138,7 +145,7 @@ public class EmbedUtils {
      * @return The {@link EmbedBuilder} for this action
      */
     public static EmbedBuilder embedMessageWithTitle(String title, String message) {
-        return defaultEmbed().setTitle(title).setDescription(message);
+        return getDefaultEmbed().setTitle(title).setDescription(message);
     }
 
     /**
@@ -150,11 +157,20 @@ public class EmbedUtils {
      * @return The {@link EmbedBuilder} for this action
      */
     public static EmbedBuilder embedImage(String imageURL) {
-        return defaultEmbed().setImage(imageURL);
+        return getDefaultEmbed().setImage(imageURL);
     }
 
+    /**
+     * Creates an embed that has bot a title and an image
+     *
+     * @param title The title of the embed
+     * @param url The url that the title links to
+     * @param image The image that the embed shows
+     *
+     * @return The {@link EmbedBuilder} for this action
+     */
     public static EmbedBuilder embedImageWithTitle(String title, String url, String image) {
-        return defaultEmbed().setTitle(title, url).setImage(image);
+        return getDefaultEmbed().setTitle(title, url).setImage(image);
     }
 
     /**
@@ -162,18 +178,20 @@ public class EmbedUtils {
      *
      * @return The default {@link EmbedBuilder embed} set in {@link #setEmbedBuilder(Supplier)}
      */
-    public static EmbedBuilder defaultEmbed() {
+    public static EmbedBuilder getDefaultEmbed() {
         return embedBuilderSupplier.get();
     }
 
-    public static EmbedBuilder defaultEmbed(long colorKey) {
-        final EmbedBuilder builder = embedBuilderSupplier.get();
-
-        if (customColors.containsKey(colorKey)) {
-            builder.setColor(customColors.get(colorKey));
-        }
-
-        return builder;
+    /**
+     * Returns the default {@link EmbedBuilder embed} set in {@link #setEmbedBuilder(Supplier)}
+     *
+     * @param guildId The guild id that has a color stored (or the defalt color)
+     *
+     * @return The default {@link EmbedBuilder embed} set in {@link #setEmbedBuilder(Supplier)} with the color value set in {@link #addColor(long, int)}
+     */
+    public static EmbedBuilder getDefaultEmbed(long guildId) {
+        return embedBuilderSupplier.get()
+            .setColor(getColorOrDefault(guildId));
     }
 
     /**
