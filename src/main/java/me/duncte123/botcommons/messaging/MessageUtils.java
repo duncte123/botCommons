@@ -33,22 +33,53 @@ import static me.duncte123.botcommons.messaging.EmbedUtils.embedToMessage;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class MessageUtils {
-
     private static String errorReaction = "❌";
     private static String successReaction = "✅";
 
+    /**
+     * Returns the current error reaction
+     *
+     * @return The current error reaction
+     *
+     * @see #sendError(Message)
+     */
     public static String getErrorReaction() {
         return errorReaction;
     }
 
+    /**
+     * Sets the new error reaction<br/>
+     * Hint: To use a custom emote as reaction use {@link net.dv8tion.jda.api.entities.Emote#getAsMention()}
+     *
+     * @param errorReaction
+     *     The new emoji/emote to use for error reactions.
+     *
+     * @see #sendError(Message)
+     */
     public static void setErrorReaction(String errorReaction) {
         MessageUtils.errorReaction = errorReaction;
     }
 
+    /**
+     * Returns the current success reaction
+     *
+     * @return The current success reaction
+     *
+     * @see #sendSuccess(Message)
+     */
     public static String getSuccessReaction() {
         return successReaction;
     }
 
+    /**
+     * Sets the new success reaction.<br/>
+     * Hint: To use a custom emote as reaction use {@link net.dv8tion.jda.api.entities.Emote#getAsMention()}
+     *
+     * @param successReaction
+     *     The new emoji/emote to use as success reaction
+     *
+     * @see #sendSuccess(Message)
+     */
     public static void setSuccessReaction(String successReaction) {
         MessageUtils.successReaction = successReaction;
     }
@@ -73,7 +104,7 @@ public class MessageUtils {
     }
 
     /**
-     * This method uses the sendError and sendMsg methods
+     * This method uses the {@link #sendError(Message)} and {@link #sendMsg(MessageConfig)} methods
      *
      * @param message
      *     the {@link Message} for the sendError method
@@ -98,7 +129,8 @@ public class MessageUtils {
      */
     public static void sendSuccess(Message message) {
         if (message.getChannelType() == ChannelType.TEXT) {
-            TextChannel channel = message.getTextChannel();
+            final TextChannel channel = message.getTextChannel();
+
             if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_HISTORY)) {
                 message.addReaction(successReaction).queue(null, (ignored) -> {
                 });
@@ -107,7 +139,7 @@ public class MessageUtils {
     }
 
     /**
-     * This method uses the sendSuccess and sendMsg methods
+     * This method uses the {@link #sendSuccess(Message)} and {@link #sendMsg(MessageConfig)} methods
      *
      * @param message
      *     the {@link Message} for the sendSuccess method
@@ -125,16 +157,18 @@ public class MessageUtils {
     }
 
     /**
+     * Shortcut for editing a message that does permission checks for embeds
      *
      * @param message
+     *     The message to edit
      * @param newContent
+     *     The new content of the message
      */
     public static void editMsg(Message message, Message newContent) {
         if (message == null || newContent == null) return;
         if (newContent.getEmbeds().size() > 0) {
             if (!message.getGuild().getSelfMember().hasPermission(message.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
-
-                MessageBuilder mb = new MessageBuilder()
+                final MessageBuilder mb = new MessageBuilder()
                     .append(newContent.getContentRaw())
                     .append('\n');
 
@@ -152,19 +186,30 @@ public class MessageUtils {
     }
 
     /**
+     * Shortcut for sending an embed from a command context
      *
      * @param ctx
+     *     The command context that holds the target channel
      * @param embed
+     *     The embed to send to the channel
+     *
+     * @see #sendEmbed(ICommandContext, EmbedBuilder, boolean)
      */
     public static void sendEmbed(ICommandContext ctx, EmbedBuilder embed) {
         sendEmbed(ctx, embed, false);
     }
 
     /**
+     * Shortcut for sending an embed from a command context
      *
      * @param ctx
+     *     The command context that has the target channel
      * @param embed
+     *     The embed to send to the channel
      * @param raw
+     *     {@code true} to skip parsing of the guild-colors and other future items, default value is {@code false}
+     *
+     * @see #sendEmbed(ICommandContext, EmbedBuilder)
      */
     public static void sendEmbed(ICommandContext ctx, EmbedBuilder embed, boolean raw) {
         sendMsg(
@@ -175,9 +220,12 @@ public class MessageUtils {
     }
 
     /**
+     * Shortcut for sending message from a command context
      *
      * @param ctx
+     *     The command context that has the target channel
      * @param message
+     *     The message to send
      */
     public static void sendMsg(ICommandContext ctx, String message) {
         sendMsg(
@@ -187,13 +235,22 @@ public class MessageUtils {
         );
     }
 
+    /**
+     * Shortcut for the lazy that don't want to build their config before sending a message, calls {@link
+     * MessageConfig.Builder#build()} underwater
+     *
+     * @param builder
+     *     The config builder to base the message off
+     */
     public static void sendMsg(MessageConfig.Builder builder) {
         sendMsg(builder.build());
     }
 
     /**
+     * Sends a message based off the message config
      *
      * @param config
+     *     The config from wha to send the message
      */
     public static void sendMsg(MessageConfig config) {
         final TextChannel channel = config.getChannel();

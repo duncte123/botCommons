@@ -21,6 +21,9 @@ import net.dv8tion.jda.internal.utils.Checks;
 
 import java.util.List;
 
+/**
+ * Provides a basic command context that should be sufficient for most bots
+ */
 public class DefaultCommandContext implements ICommandContext {
     private final GuildMessageReceivedEvent event;
     private final List<String> args;
