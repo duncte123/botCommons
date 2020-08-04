@@ -398,7 +398,7 @@ public final class WebUtils extends Reliqua {
         return createRequest(
             defaultRequest()
                 .url(url)
-                .header("content-Type", body.getContentType())
+                .header("content-Type", body.getContentType().getType())
                 .post(body.toRequestBody())
         );
     }

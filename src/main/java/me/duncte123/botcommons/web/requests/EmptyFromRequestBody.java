@@ -22,8 +22,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class EmptyFromRequestBody implements IRequestBody {
     @Override
-    public @NotNull String getContentType() {
-        return ContentType.URLENCODED.getType();
+    public @NotNull ContentType getContentType() {
+        return ContentType.URLENCODED;
     }
 
     @Override

@@ -24,8 +24,8 @@ public class PlainTextRequestBody implements IRequestBody {
     private final StringBuilder body = new StringBuilder();
 
     @Override
-    public @NotNull String getContentType() {
-        return ContentType.TEXT_PLAIN.getType();
+    public @NotNull ContentType getContentType() {
+        return ContentType.TEXT_PLAIN;
     }
 
     public PlainTextRequestBody setContent(@NotNull String content) {

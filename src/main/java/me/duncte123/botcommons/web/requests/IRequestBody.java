@@ -16,6 +16,7 @@
 
 package me.duncte123.botcommons.web.requests;
 
+import me.duncte123.botcommons.web.ContentType;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import org.jetbrains.annotations.NotNull;
@@ -24,13 +25,13 @@ import org.jetbrains.annotations.Nullable;
 public interface IRequestBody {
 
     @NotNull
-    String getContentType();
+    ContentType getContentType();
 
     @NotNull
     RequestBody toRequestBody();
 
     @Nullable
     default MediaType getMediaType() {
-        return MediaType.parse(getContentType());
+        return MediaType.parse(getContentType().getType());
     }
 }

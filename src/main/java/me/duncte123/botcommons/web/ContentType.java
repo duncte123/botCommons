@@ -27,7 +27,7 @@ public enum ContentType {
     OCTET_STREAM("application/octet-stream"),
     ANY("*/*");
 
-    private String type;
+    private final String type;
 
     ContentType(String type) {
         this.type = type;

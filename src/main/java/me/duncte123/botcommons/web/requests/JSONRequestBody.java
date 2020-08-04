@@ -63,8 +63,8 @@ public class JSONRequestBody implements IRequestBody {
     }
 
     @Override
-    public @NotNull String getContentType() {
-        return ContentType.JSON.getType();
+    public @NotNull ContentType getContentType() {
+        return ContentType.JSON;
     }
 
     @Override

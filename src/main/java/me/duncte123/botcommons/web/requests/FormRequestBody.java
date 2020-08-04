@@ -17,37 +17,25 @@
 package me.duncte123.botcommons.web.requests;
 
 import me.duncte123.botcommons.web.ContentType;
+import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static me.duncte123.botcommons.web.WebUtils.urlEncodeString;
-
 public class FormRequestBody implements IRequestBody {
-
-    private final Map<String, String> params = new HashMap<>();
+    private final FormBody.Builder builder = new FormBody.Builder();
 
     public FormRequestBody append(@NotNull String key, @NotNull String value) {
-        params.put(urlEncodeString(key), urlEncodeString(value));
-
+        this.builder.add(key, value);
         return this;
     }
 
     @Override
-    public @NotNull String getContentType() {
-        return ContentType.URLENCODED.getType();
+    public @NotNull ContentType getContentType() {
+        return ContentType.URLENCODED;
     }
 
     @Override
     public @NotNull RequestBody toRequestBody() {
-        final String body = params.entrySet()
-            .stream()
-            .map((entry) -> entry.getKey() + "=" + entry.getValue())
-            .collect(Collectors.joining("&"));
-
-        return RequestBody.create(null, body.getBytes());
+        return this.builder.build();
     }
 }
