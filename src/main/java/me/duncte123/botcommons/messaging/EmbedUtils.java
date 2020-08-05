@@ -20,6 +20,7 @@ import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Role;
 
 import java.util.function.Supplier;
 
@@ -29,7 +30,7 @@ import java.util.function.Supplier;
 public class EmbedUtils {
     private static Supplier<EmbedBuilder> embedBuilderSupplier = EmbedBuilder::new;
     static final TLongIntMap customColors = new TLongIntHashMap();
-    private static int defaultColor = 0xFF00FF;
+    private static int defaultColor = Role.DEFAULT_COLOR_RAW;
 
     /**
      * Sets the embed builder for the util method
