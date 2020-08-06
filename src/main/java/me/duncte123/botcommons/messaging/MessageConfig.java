@@ -351,10 +351,12 @@ public class MessageConfig {
         }
 
         /**
-         * Builds the message config and returns it
+         * Builds the message config and returns it.
+         * <p><b>NOTE:</b> This method will return null when the text channel is null</p>
          *
          * @return a message config instance
          */
+        @Nonnull
         public MessageConfig build() {
             if (this.channel == null) {
                 throw new IllegalArgumentException("No text channel has been set, set this with setChannel");

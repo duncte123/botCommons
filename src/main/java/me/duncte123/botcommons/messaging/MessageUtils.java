@@ -27,6 +27,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 import static me.duncte123.botcommons.messaging.EmbedUtils.embedToMessage;
@@ -235,6 +237,38 @@ public class MessageUtils {
         );
     }
 
+    /*
+    Undocumented, for internal use only
+     */
+    public static void sendMsg(@Nullable TextChannel channel, String message) {
+        if (channel == null) {
+            return;
+        }
+
+        sendMsg(
+            new MessageConfig.Builder()
+                .setChannel(channel)
+                .setMessage(message)
+                .build()
+        );
+    }
+
+    /*
+    Undocumented, for internal use only
+     */
+    public static void sendEmbed(TextChannel channel, EmbedBuilder embed, boolean raw) {
+        if (channel == null) {
+            return;
+        }
+
+        sendMsg(
+            new MessageConfig.Builder()
+                .setChannel(channel)
+                .setEmbed(embed, raw)
+                .build()
+        );
+    }
+
     /**
      * Shortcut for the lazy that don't want to build their config before sending a message, calls {@link
      * MessageConfig.Builder#build()} underwater
@@ -252,7 +286,7 @@ public class MessageUtils {
      * @param config
      *     The config from wha to send the message
      */
-    public static void sendMsg(MessageConfig config) {
+    public static void sendMsg(@Nonnull MessageConfig config) {
         final TextChannel channel = config.getChannel();
         final Guild guild = channel.getGuild();
         final TextChannel channelById = guild.getTextChannelById(channel.getIdLong());
