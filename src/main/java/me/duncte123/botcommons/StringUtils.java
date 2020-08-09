@@ -86,9 +86,12 @@ public class StringUtils {
     }
 
     /**
+     * Capitalizes a string (this is NOT the same as String#toUpperCase)
      *
      * @param str
-     * @return
+     *     the string to capitalize
+     *
+     * @return the capitalized string
      */
     public static String capitalizeFully(String str) {
         Checks.notBlank(str, "str");

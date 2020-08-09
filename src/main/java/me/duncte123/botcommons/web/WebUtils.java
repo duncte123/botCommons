@@ -472,9 +472,10 @@ public final class WebUtils extends Reliqua {
     }
 
     /**
+     * Url encodes a string
      *
-     * @param input
-     * @return
+     * @param input the string the url encode
+     * @return the url encoded string
      */
     public static String urlEncodeString(String input) {
         try {
