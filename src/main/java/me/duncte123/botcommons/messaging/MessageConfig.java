@@ -300,10 +300,29 @@ public class MessageConfig {
         /**
          * Returns the current message builder instance for you to modify
          *
-         * @return The builder instance, useful for chaining
+         * @return The message builder instance that you can modify
+         *
+         * @see #configureMessageBuilder(Consumer)
          */
         public MessageBuilder getMessageBuilder() {
             return messageBuilder;
+        }
+
+        /**
+         * Applies a configuration to the message builder
+         *
+         * @param consumer
+         *     the builder that you can modify
+         *
+         * @return The builder instance, useful for chaining
+         *
+         * @see #getMessageBuilder()
+         */
+        public Builder configureMessageBuilder(@Nonnull Consumer<MessageBuilder> consumer) {
+            Checks.notNull(consumer, "consumer");
+
+            consumer.accept(this.messageBuilder);
+            return this;
         }
 
         /**
