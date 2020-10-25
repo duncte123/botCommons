@@ -19,7 +19,9 @@ package me.duncte123.botcommons.messaging;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.internal.utils.Checks;
 
+import javax.annotation.Nonnull;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -35,35 +37,31 @@ public class EmbedUtils {
      * Sets the embed builder for the util method
      *
      * @param embedBuilderSupplier
-     *         the default embed layout
+     *     the default embed layout
      */
-    public static void setEmbedBuilder(Supplier<EmbedBuilder> embedBuilderSupplier) {
+    public static void setEmbedBuilder(@Nonnull Supplier<EmbedBuilder> embedBuilderSupplier) {
+        Checks.notNull(embedBuilderSupplier, "embedBuilderSupplier");
+
         EmbedUtils.embedBuilderSupplier = embedBuilderSupplier;
     }
 
-    public static void setEmbedColorSupplier(Function<Long, Integer> supplier) {
-        EmbedUtils.embedColorSupplier = supplier;
-    }
-
     /**
-     * Adds a color for a guild id
+     * Sets the supplier that gets embed colors
      *
-     * @param key
-     *         the guild id
-     * @param value
-     *         the color for this guild
-     * @deprecated use the ... instead
+     * @param supplier
+     *     the supplier for getting embed colors, the parameter is the guild id
      */
-    @Deprecated
-    public static void addColor(long key, int value) {
-        throw new UnsupportedOperationException("Method removed");
+    public static void setEmbedColorSupplier(@Nonnull Function<Long, Integer> supplier) {
+        Checks.notNull(supplier, "supplier");
+
+        EmbedUtils.embedColorSupplier = supplier;
     }
 
     /**
      * Gets a color for an id
      *
      * @param key
-     *         the id to find the color for
+     *     the id to find the color for
      *
      * @return The color for this key or "0"
      */
@@ -75,7 +73,7 @@ public class EmbedUtils {
      * Gets a color for an id
      *
      * @param key
-     *         the id to find the color for
+     *     the id to find the color for
      *
      * @return The color for this key or the default value
      *
@@ -93,15 +91,6 @@ public class EmbedUtils {
     }
 
     /**
-     * Sets the default color of all embeds
-     *
-     * @param defaultColor The default color of all embeds
-     */
-    public static void setDefaultColor(int defaultColor) {
-        EmbedUtils.defaultColor = defaultColor;
-    }
-
-    /**
      * Returns the default color of all embeds
      *
      * @return the default color of all embeds
@@ -111,12 +100,22 @@ public class EmbedUtils {
     }
 
     /**
+     * Sets the default color of all embeds
+     *
+     * @param defaultColor
+     *     The default color of all embeds
+     */
+    public static void setDefaultColor(int defaultColor) {
+        EmbedUtils.defaultColor = defaultColor;
+    }
+
+    /**
      * The default way to send a embedded message to the channel with a field in it
      *
      * @param title
-     *         The title of the field
+     *     The title of the field
      * @param message
-     *         The message to display
+     *     The message to display
      *
      * @return The {@link EmbedBuilder} for this action
      */
@@ -128,7 +127,7 @@ public class EmbedUtils {
      * The default way to display a nice embedded message
      *
      * @param message
-     *         The message to display
+     *     The message to display
      *
      * @return The {@link EmbedBuilder} for this action
      */
@@ -140,9 +139,9 @@ public class EmbedUtils {
      * The default way to display a nice embedded message
      *
      * @param message
-     *         The message to display
+     *     The message to display
      * @param title
-     *         The title for the embed
+     *     The title for the embed
      *
      * @return The {@link EmbedBuilder} for this action
      */
@@ -154,7 +153,7 @@ public class EmbedUtils {
      * The default way to send a embedded image to the channel
      *
      * @param imageURL
-     *         The url from the image
+     *     The url from the image
      *
      * @return The {@link EmbedBuilder} for this action
      */
@@ -165,9 +164,12 @@ public class EmbedUtils {
     /**
      * Creates an embed that has bot a title and an image
      *
-     * @param title The title of the embed
-     * @param url The url that the title links to
-     * @param image The image that the embed shows
+     * @param title
+     *     The title of the embed
+     * @param url
+     *     The url that the title links to
+     * @param image
+     *     The image that the embed shows
      *
      * @return The {@link EmbedBuilder} for this action
      */
@@ -187,9 +189,11 @@ public class EmbedUtils {
     /**
      * Returns the default {@link EmbedBuilder embed} set in {@link #setEmbedBuilder(Supplier)}
      *
-     * @param guildId The guild id that has a color stored (or the defalt color)
+     * @param guildId
+     *     The guild id that has a color stored (or the defalt color)
      *
-     * @return The default {@link EmbedBuilder embed} set in {@link #setEmbedBuilder(Supplier)} with the color value set in {@link #addColor(long, int)}
+     * @return The default {@link EmbedBuilder embed} set in {@link #setEmbedBuilder(Supplier)} with the color value set
+     * in {@link #setEmbedColorSupplier(Function)}
      */
     public static EmbedBuilder getDefaultEmbed(long guildId) {
         return embedBuilderSupplier.get()
@@ -200,7 +204,7 @@ public class EmbedUtils {
      * This will convert our embeds for if the bot is not able to send embeds
      *
      * @param embed
-     *         the {@link MessageEmbed} that we are trying to send
+     *     the {@link MessageEmbed} that we are trying to send
      *
      * @return the converted embed
      */
