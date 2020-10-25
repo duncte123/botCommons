@@ -54,7 +54,7 @@ dependencies {
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     }
 
-    api group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
+    //api group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
 
     // https://mvnrepository.com/artifact/org.json/json
     compileOnly group: 'org.json', name: 'json', version: '20180813' // Provided by the user

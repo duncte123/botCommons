@@ -47,7 +47,7 @@ public class EmbedUtilsTest {
     public void testCanSetCustomColors() {
         int color = 0xFF00FF;
 
-        EmbedUtils.addColor(3L, color);
+        EmbedUtils.setEmbedColorSupplier((guildId) -> color);
 
         MessageEmbed embed = EmbedUtils.getDefaultEmbed(3L).build();
 

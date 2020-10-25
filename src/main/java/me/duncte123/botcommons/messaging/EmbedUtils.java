@@ -16,12 +16,11 @@
 
 package me.duncte123.botcommons.messaging;
 
-import gnu.trove.map.TLongIntMap;
-import gnu.trove.map.hash.TLongIntHashMap;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -29,8 +28,8 @@ import java.util.function.Supplier;
  */
 public class EmbedUtils {
     private static Supplier<EmbedBuilder> embedBuilderSupplier = EmbedBuilder::new;
-    static final TLongIntMap customColors = new TLongIntHashMap();
     private static int defaultColor = Role.DEFAULT_COLOR_RAW;
+    static Function<Long, Integer> embedColorSupplier = (__) -> defaultColor;
 
     /**
      * Sets the embed builder for the util method
@@ -42,6 +41,10 @@ public class EmbedUtils {
         EmbedUtils.embedBuilderSupplier = embedBuilderSupplier;
     }
 
+    public static void setEmbedColorSupplier(Function<Long, Integer> supplier) {
+        EmbedUtils.embedColorSupplier = supplier;
+    }
+
     /**
      * Adds a color for a guild id
      *
@@ -49,19 +52,11 @@ public class EmbedUtils {
      *         the guild id
      * @param value
      *         the color for this guild
+     * @deprecated use the ... instead
      */
+    @Deprecated
     public static void addColor(long key, int value) {
-        customColors.put(key, value);
-    }
-
-    /**
-     * Removes a color for a guild id
-     *
-     * @param key
-     *         the id to remove the color for
-     */
-    public static void removeColor(long key) {
-        customColors.remove(key);
+        throw new UnsupportedOperationException("Method removed");
     }
 
     /**
@@ -73,7 +68,7 @@ public class EmbedUtils {
      * @return The color for this key or "0"
      */
     public static int getColor(long key) {
-        return customColors.get(key);
+        return embedColorSupplier.apply(key);
     }
 
     /**
@@ -88,7 +83,13 @@ public class EmbedUtils {
      * @see #getDefaultColor()
      */
     public static int getColorOrDefault(long key) {
-        return customColors.containsKey(key) ? customColors.get(key) : defaultColor;
+        final int color = getColor(key);
+
+        if (color <= 0) {
+            return defaultColor;
+        }
+
+        return color;
     }
 
     /**
