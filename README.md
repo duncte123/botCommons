@@ -7,7 +7,7 @@ The current latest version is: [ ![version][] ][download]
 
 ## Usage
 
-Usage instructions can be found [here][usage]
+Usage instructions can be found [here][usage] with some examples in the [tests folder](src/test/java/me/duncte123/botcommons)
 
 ## Bot not shutting down?
 A shutdown method was created in the `BotCommons` class. <br>
