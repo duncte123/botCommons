@@ -40,6 +40,8 @@ public class MessageConfig {
     private final TextChannel channel;
     private final MessageBuilder messageBuilder;
     private final EmbedBuilder embed;
+    private final long replyToId;
+    private final boolean mentionRepliedUser;
 
     private final Consumer<? super Throwable> failureAction;
     private final Consumer<? super Message> successAction;
@@ -54,6 +56,9 @@ public class MessageConfig {
      *     The message builder that holds the content for the message
      * @param embed
      *     An optional embed to send with the message
+     * @param replyToId
+     *     A message id to reply to, set to {@code 0} to disable
+     * @param mentionRepliedUser {@code false} to not ping the user in the reply (Default: {@code true})
      * @param failureAction
      *     The action that will be invoked when the message sending fails
      * @param successAction
@@ -63,7 +68,8 @@ public class MessageConfig {
      *
      * @see Builder
      */
-    public MessageConfig(TextChannel channel, MessageBuilder messageBuilder, EmbedBuilder embed, Consumer<? super Throwable> failureAction,
+    public MessageConfig(TextChannel channel, MessageBuilder messageBuilder, EmbedBuilder embed, long replyToId,
+                         boolean mentionRepliedUser, Consumer<? super Throwable> failureAction,
                          Consumer<? super Message> successAction, Consumer<MessageAction> actionConfig) {
 
         Checks.notNull(channel, "channel");
@@ -73,6 +79,8 @@ public class MessageConfig {
         this.channel = channel;
         this.messageBuilder = messageBuilder;
         this.embed = embed;
+        this.replyToId = replyToId;
+        this.mentionRepliedUser = mentionRepliedUser;
         this.failureAction = failureAction;
         this.successAction = successAction;
         this.actionConfig = actionConfig;
@@ -108,6 +116,24 @@ public class MessageConfig {
     @Nullable
     public EmbedBuilder getEmbed() {
         return this.embed;
+    }
+
+    /**
+     * Returns the id of the message to reply to
+     *
+     * @return the message id that we want to reply to
+     */
+    public long getReplyToId() {
+        return replyToId;
+    }
+
+    /**
+     * Returns true if we should mention the user we reply to, false otherwise
+     *
+     * @return true if we should mention the user we reply to, false otherwise
+     */
+    public boolean isMentionRepliedUser() {
+        return mentionRepliedUser;
     }
 
     /**
@@ -159,6 +185,8 @@ public class MessageConfig {
      */
     public static class Builder {
         private final MessageBuilder messageBuilder = new MessageBuilder();
+        private long replyToId;
+        private boolean mentionRepliedUser = MessageAction.isDefaultMentionRepliedUser();
         private TextChannel channel;
         private EmbedBuilder embed;
 
@@ -247,7 +275,7 @@ public class MessageConfig {
          * @deprecated Use the method that takes in an embed builder instead
          */
         @Deprecated
-        @ForRemoval(deadline = "2.0.1")
+        @ForRemoval(deadline = "2.1.0")
         public Builder setEmbed(MessageEmbed embed) {
             final EmbedBuilder builder = new EmbedBuilder(embed);
             final long guild = channel.getGuild().getIdLong();
@@ -329,7 +357,7 @@ public class MessageConfig {
          * Sets the action that is called when the {@link RestAction} fails
          *
          * @param failureAction
-         *     the action that is called when the {@link RestAction} fails
+         *     the action that is called when the {@link RestAction} fails, Defaults to {@link RestAction#getDefaultFailure()}
          *
          * @return The builder instance, useful for chaining
          */
@@ -342,7 +370,7 @@ public class MessageConfig {
          * Sets the action that is called when the {@link RestAction} succeeds
          *
          * @param successAction
-         *     the action that is called when the {@link RestAction} succeeds
+         *     the action that is called when the {@link RestAction} succeeds, Defaults to {@link RestAction#getDefaultSuccess()}
          *
          * @return The builder instance, useful for chaining
          */
@@ -361,11 +389,96 @@ public class MessageConfig {
          *
          * @see MessageAction#append(CharSequence)
          * @see MessageAction#nonce(String)
+         * @see MessageAction
          */
         public Builder setActionConfig(@Nonnull Consumer<MessageAction> actionConfig) {
             Checks.notNull(actionConfig, "actionConfig");
 
             this.actionConfig = actionConfig;
+            return this;
+        }
+
+        /**
+         * Replies to the given {@link Message}
+         *
+         * @param message
+         *     The {@link Message} on discord that you want to reply to, or {@code null} to disable
+         *
+         * @return The builder instance, useful for chaining
+         *
+         * @see #replyTo(long)
+         * @see #replyTo(long, boolean)
+         * @see #replyTo(Message, boolean)
+         */
+        public Builder replyTo(@Nullable Message message) {
+            if (message == null) {
+                this.replyToId = 0;
+            } else {
+                this.replyToId = message.getIdLong();
+            }
+
+            return this;
+        }
+
+        /**
+         * Replies to the given {@link Message}
+         *
+         * @param message
+         *     The {@link Message} on discord that you want to reply to, or {@code null} to disable
+         * @param mentionRepliedUser
+         *     Set to {@code false} to not ping the user in the reply (Default: {@link MessageAction#isDefaultMentionRepliedUser()})
+         *
+         * @return The builder instance, useful for chaining
+         *
+         * @see #replyTo(long)
+         * @see #replyTo(long, boolean)
+         * @see #replyTo(Message)
+         */
+        public Builder replyTo(@Nullable Message message, boolean mentionRepliedUser) {
+            if (message == null) {
+                this.replyToId = 0;
+            } else {
+                this.replyToId = message.getIdLong();
+            }
+
+            this.mentionRepliedUser = mentionRepliedUser;
+            return this;
+        }
+
+        /**
+         * Replies to the given message with the specified id
+         *
+         * @param messageId
+         *     The message id from a message on discord, set to {@code 0} to disable
+         *
+         * @return The builder instance, useful for chaining
+         *
+         * @see #replyTo(long, boolean)
+         * @see #replyTo(Message)
+         * @see #replyTo(Message, boolean)
+         */
+        public Builder replyTo(long messageId) {
+            this.replyToId = messageId;
+            return this;
+        }
+
+        /**
+         * Replies to the given message with the specified id
+         *
+         * @param messageId
+         *     The message id from a message on discord, set to {@code 0} to disable
+         * @param mentionRepliedUser
+         *     Set to {@code false} to not ping the user in the reply (Default: {@link MessageAction#isDefaultMentionRepliedUser()})
+         *
+         * @return The builder instance, useful for chaining
+         *
+         * @see #replyTo(long)
+         * @see #replyTo(Message)
+         * @see #replyTo(Message, boolean)
+         */
+        public Builder replyTo(long messageId, boolean mentionRepliedUser) {
+            this.replyToId = messageId;
+            this.mentionRepliedUser = mentionRepliedUser;
             return this;
         }
 
@@ -390,6 +503,8 @@ public class MessageConfig {
                 this.channel,
                 this.messageBuilder,
                 this.embed,
+                this.replyToId,
+                this.mentionRepliedUser,
                 this.failureAction,
                 this.successAction,
                 this.actionConfig
