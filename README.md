@@ -18,7 +18,10 @@ This method also accepts your JDA or ShardManager instance for killing the threa
 
 ```GRADLE
 repositories {
-    jcenter()
+    maven {
+        name 'duncte123-jfrog'
+        url 'https://duncte123.jfrog.io/artifactory/maven'
+    }
 }
 
 dependencies {
@@ -30,9 +33,9 @@ dependencies {
 
 ```XML
 <repository>
-    <id>jcenter</id>
-    <name>jcenter-bintray</name>
-    <url>https://jcenter.bintray.com</url>
+    <id>jfrog-duncte123</id>
+    <name>jfrog-duncte123</name>
+    <url>https://duncte123.jfrog.io/artifactory/maven</url>
 </repository>
 
 <dependency>
