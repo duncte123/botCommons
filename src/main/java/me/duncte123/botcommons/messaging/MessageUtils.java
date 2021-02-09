@@ -321,6 +321,11 @@ public class MessageUtils {
         if (messageBuilder.length() <= Message.MAX_CONTENT_LENGTH) {
             final MessageAction messageAction = channel.sendMessage(messageBuilder.build());
 
+            if (config.getReplyToId() > 0) {
+                messageAction.referenceById(config.getReplyToId())
+                    .mentionRepliedUser(config.isMentionRepliedUser());
+            }
+
             actionConfig.accept(messageAction);
             messageAction.queue(successAction, failureAction);
             return;
@@ -330,8 +335,12 @@ public class MessageUtils {
             (message) -> {
                 final MessageAction messageAction = channel.sendMessage(message);
 
-                actionConfig.accept(messageAction);
+                if (config.getReplyToId() > 0) {
+                    messageAction.referenceById(config.getReplyToId())
+                        .mentionRepliedUser(config.isMentionRepliedUser());
+                }
 
+                actionConfig.accept(messageAction);
                 messageAction.queue(successAction, failureAction);
             }
         );

@@ -5,7 +5,7 @@
 Setting the default embed builder:
 ```java
 import me.duncte123.botcommons.messaging.EmbedUtils;
-import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 class SettingBuilderExample {
     public void setBuilderExample() {
@@ -40,7 +40,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 
 class SendingMessageExample {
     public void sendMessageExample(TextChannel channel) {
-      String url = "https://cdn.duncte123.me/wr625PaolD";
+      String url = "https://cdn.duncte123.me/AN-wr625PaolD";
       MessageEmbed embed = EmbedUtils.embedImage(url).build();
       
       channel.sendMessage(embed).queue();
