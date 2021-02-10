@@ -1,4 +1,4 @@
-# BotCommons [![CircleCI][circleImage]][circleLink]
+# BotCommons [![BuildStatus][circleImage]][circleLink]
 A set of tools for the [JDA] library
 
 
@@ -15,6 +15,7 @@ This method also accepts your JDA or ShardManager instance for killing the threa
 
 
 #### With gradle
+[ ![version][] ][download]
 
 ```GRADLE
 repositories {
@@ -48,8 +49,8 @@ dependencies {
 Make sure to replace `[VERSION]` with the version listed above.
 
 [JDA]: https://github.com/DV8FromTheWorld/JDA
-[version]: https://api.bintray.com/packages/duncte123/maven/botcommons/images/download.svg
-[download]: https://bintray.com/duncte123/maven/botcommons/_latestVersion
+[version]: https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fduncte123.jfrog.io%2Fartifactory%2Fmaven%2Fme%2Fduncte123%2FbotCommons%2Fmaven-metadata.xml
+[download]: https://duncte123.jfrog.io/ui/packages/gav:%2F%2Fme.duncte123:botCommons
 [usage]: USAGE.md
-[circleLink]: https://circleci.com/gh/duncte123/botCommons/tree/master
-[circleImage]: https://circleci.com/gh/duncte123/botCommons/tree/master.svg?style=shield
+[circleLink]: https://github.com/duncte123/botCommons
+[circleImage]: https://github.com/duncte123/botCommons/workflows/release-botcommons/badge.svg
