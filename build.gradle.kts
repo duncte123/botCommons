@@ -83,6 +83,10 @@ val clean: Task by tasks
 val test: Task by tasks
 val check: Task by tasks
 
+javadoc.apply {
+    isFailOnError = false
+}
+
 val sourcesJar = task<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
     from(sourceSets["main"].allJava)
