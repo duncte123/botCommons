@@ -52,7 +52,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.json/json
     compileOnly(group = "org.json", name = "json", version = "20180813") // Provided by the user
 
-    compileOnly(group = "net.dv8tion", name = "JDA", version = "4.2.0_219") {
+    compileOnly(group = "net.dv8tion", name = "JDA", version = "4.2.0_247") {
         exclude(module = "opus-java")
     }
 
