@@ -21,11 +21,14 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class FormRequestBody implements IRequestBody {
-    private final FormBody.Builder builder = new FormBody.Builder();
+    private final Map<String, String> params = new HashMap<>();
 
     public FormRequestBody append(@NotNull String key, @NotNull String value) {
-        this.builder.add(key, value);
+        this.params.put(key, value);
         return this;
     }
 
@@ -36,6 +39,12 @@ public class FormRequestBody implements IRequestBody {
 
     @Override
     public @NotNull RequestBody toRequestBody() {
-        return this.builder.build();
+        // this builder has a weird impl so we can't reuse it (and we probably shouldn't)
+        final FormBody.Builder builder = new FormBody.Builder();
+
+        // Add all the params to the builder
+        this.params.forEach(builder::add);
+
+        return builder.build();
     }
 }
