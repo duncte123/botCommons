@@ -26,7 +26,8 @@ val archivesBaseName = "botCommons"
 
 repositories {
     mavenCentral()
-    jcenter() // Legacy :(
+    maven("https://m2.dv8tion.net/releases")
+    maven("https://duncte123.jfrog.io/artifactory/maven")
 }
 
 java {
@@ -45,18 +46,18 @@ dependencies {
     api(group = "com.squareup.okhttp3", name = "okhttp", version = "3.14.9")
 
     // https://bintray.com/natanbc/maven/reliqua/
-    api(group = "me.duncte123", name = "reliqua", version = "2.4.10") {
+    api(group = "me.duncte123", name = "reliqua", version = "2.5.1") {
         exclude(group = "com.squareup.okhttp3", module = "okhttp")
     }
 
     // https://mvnrepository.com/artifact/org.json/json
     compileOnly(group = "org.json", name = "json", version = "20180813") // Provided by the user
 
-    compileOnly(group = "net.dv8tion", name = "JDA", version = "4.2.0_247") {
+    compileOnly(group = "net.dv8tion", name = "JDA", version = "4.2.0_252") {
         exclude(module = "opus-java")
     }
 
-    testImplementation (group = "net.dv8tion", name = "JDA", version = "4.2.0_219") {
+    testImplementation (group = "net.dv8tion", name = "JDA", version = "4.2.0_252") {
         exclude(module = "opus-java")
     }
 
