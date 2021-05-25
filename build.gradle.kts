@@ -36,23 +36,14 @@ java {
 }
 
 dependencies {
-    // https://bintray.com/bintray/jcenter/com.fasterxml.jackson.core:jackson-databind
     api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.10.1")
-
-    // https://mvnrepository.com/artifact/org.jsoup/jsoup
     api(group = "org.jsoup", name = "jsoup", version = "1.13.1")
-
-    // https://bintray.com/bintray/jcenter/com.squareup.okhttp3:okhttp
     api(group = "com.squareup.okhttp3", name = "okhttp", version = "3.14.9")
-
-    // https://bintray.com/natanbc/maven/reliqua/
-    api(group = "me.duncte123", name = "reliqua", version = "2.5.1") {
+    api(group = "me.duncte123", name = "reliqua", version = "2.6.4") {
         exclude(group = "com.squareup.okhttp3", module = "okhttp")
     }
 
-    // https://mvnrepository.com/artifact/org.json/json
     compileOnly(group = "org.json", name = "json", version = "20180813") // Provided by the user
-
     compileOnly(group = "net.dv8tion", name = "JDA", version = "4.2.0_252") {
         exclude(module = "opus-java")
     }
@@ -60,9 +51,7 @@ dependencies {
     testImplementation (group = "net.dv8tion", name = "JDA", version = "4.2.0_252") {
         exclude(module = "opus-java")
     }
-
     testImplementation(group = "junit", name = "junit", version = "4.12")
-
     testImplementation("com.squareup.okhttp3:mockwebserver:3.14.4")
 
 }

@@ -77,10 +77,13 @@ public class WebTest {
 
         HttpUrl baseUrl = server.url("/llama");
 
+        System.out.println("Before");
         WebUtils.ins.getJSONObject(baseUrl.toString())
-            .async(
-                json -> assertNotNull(json.get("data").get("file").asText())
-            );
+            .async(json -> {
+                    assertNotNull(json.get("data").get("file").asText());
+                    System.out.println("During");
+            });
+        System.out.println("After");
     }
 
     @Test
@@ -90,6 +93,44 @@ public class WebTest {
         );
 
         assertEquals(StatusCodeValidator.ACCEPT_2XX, pendingRequest.getStatusCodeValidator());
+    }
+
+    @Test
+    public void testRateLimiting() {
+        MockWebServer server = new MockWebServer();
+        server.enqueue(new MockResponse()
+            .addHeader("Content-Type", "application/json; charset=utf-8")
+            .addHeader("X-RateLimit-Remaining", 1)
+            .addHeader("X-RateLimit-Limit", 1)
+            .addHeader("X-RateLimit-Reset-After", 5)
+            .setBody("My cool body")
+        );
+
+        HttpUrl urlOne = server.url("/bla-request-one");
+        final String s1 = WebUtils.ins.getText(urlOne.toString()).execute();
+
+        System.out.println(s1);
+        assertEquals("My cool body", s1);
+
+        server.enqueue(new MockResponse()
+            .addHeader("Content-Type", "application/json; charset=utf-8")
+            .addHeader("X-RateLimit-Remaining", 1)
+            .addHeader("X-RateLimit-Limit", 1)
+            .addHeader("X-RateLimit-Reset-After", 5)
+            .setBody("My cool body 2")
+        );
+
+        final double curr = Math.floor(System.currentTimeMillis() / 1000D);
+
+        final String s2 = WebUtils.ins.getText(urlOne.toString()).execute();
+
+        System.out.println(s2);
+        assertEquals("My cool body 2", s2);
+
+        final double now = Math.floor(System.currentTimeMillis() / 1000D);
+
+        // should have waited for 5 seconds
+        assertEquals(5D, now - curr, 0.5D);
     }
 
 }

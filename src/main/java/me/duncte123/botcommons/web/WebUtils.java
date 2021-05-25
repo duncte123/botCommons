@@ -45,7 +45,6 @@ public final class WebUtils extends Reliqua {
     private static String USER_AGENT = "Mozilla/5.0 (compatible; BotCommons/" + BotCommons.VERSION + "; +https://github.com/duncte123/BotCommons;)";
     private final ObjectMapper mapper = JSONHelper.createObjectMapper();
 
-    // TODO: implement rate limiting
     private WebUtils() {
         super(
             new OkHttpClient.Builder()
