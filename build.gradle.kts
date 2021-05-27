@@ -21,7 +21,7 @@ plugins {
 }
 
 group = "me.duncte123"
-version = "${getVersionPrefix()}2.1.${getBuildNum()}"
+version = "${getVersionPrefix()}2.2.${getBuildNum()}"
 val archivesBaseName = "botCommons"
 
 repositories {

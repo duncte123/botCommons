@@ -184,7 +184,7 @@ public class MessageConfig {
      * Builder class for the message config
      */
     public static class Builder {
-        private final MessageBuilder messageBuilder = new MessageBuilder();
+        private MessageBuilder messageBuilder = new MessageBuilder();
         private long replyToId;
         private boolean mentionRepliedUser = MessageAction.isDefaultMentionRepliedUser();
         private TextChannel channel;
@@ -211,8 +211,8 @@ public class MessageConfig {
         }
 
         /**
-         * Sets the message content for the message that will be sent, the content will be extracted from {@link
-         * Message#getContentRaw()}
+         * Sets the message content for the message that will be sent.<br/>
+         * <b>THIS WILL REPLACE THE CURRENT MESSAGE BUILDER</b>
          *
          * @param message
          *     The message to extract the content from
@@ -223,7 +223,18 @@ public class MessageConfig {
          * @see #setMessageFormat(String, Object...)
          */
         public Builder setMessage(Message message) {
-            this.messageBuilder.setContent(message.getContentRaw());
+            this.messageBuilder = new MessageBuilder(message);
+            // clear the embed
+            this.messageBuilder.setEmbed(null);
+
+            // set the first embed on our own config
+            if (!message.getEmbeds().isEmpty()) {
+                this.setEmbed(
+                    new EmbedBuilder(message.getEmbeds().get(0)),
+                    true
+                );
+            }
+
             return this;
         }
 
