@@ -39,7 +39,7 @@ dependencies {
     api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.10.1")
     api(group = "org.jsoup", name = "jsoup", version = "1.13.1")
     api(group = "com.squareup.okhttp3", name = "okhttp", version = "3.14.9")
-    api(group = "me.duncte123", name = "reliqua", version = "2.6.4") {
+    api(group = "me.duncte123", name = "reliqua", version = "2.6.5") {
         exclude(group = "com.squareup.okhttp3", module = "okhttp")
     }
 

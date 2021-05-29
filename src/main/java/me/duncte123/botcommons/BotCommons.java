@@ -54,6 +54,10 @@ public class BotCommons {
      * Kills all the threads that BotCommons uses internally, allowing your bot to shut own without using System.exit
      */
     public static void shutdown() {
-        WebUtils.ins.shutdown();
+        try {
+            WebUtils.ins.shutdown();
+        } catch (Exception e) {
+            e.printStackTrace(); // should never happen but just in case
+        }
     }
 }
