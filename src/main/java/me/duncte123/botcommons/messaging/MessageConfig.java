@@ -410,7 +410,8 @@ public class MessageConfig {
         }
 
         /**
-         * Replies to the given {@link Message}
+         * Replies to the given {@link Message}<br>
+         * <b>THIS WILL ONLY WORK IF THE BOT HAS READ HISTORY PERMISSION IN THE CHANNEL</b>
          *
          * @param message
          *     The {@link Message} on discord that you want to reply to, or {@code null} to disable
@@ -432,7 +433,8 @@ public class MessageConfig {
         }
 
         /**
-         * Replies to the given {@link Message}
+         * Replies to the given {@link Message}<br>
+         * <b>THIS WILL ONLY WORK IF THE BOT HAS READ HISTORY PERMISSION IN THE CHANNEL</b>
          *
          * @param message
          *     The {@link Message} on discord that you want to reply to, or {@code null} to disable
@@ -457,7 +459,8 @@ public class MessageConfig {
         }
 
         /**
-         * Replies to the given message with the specified id
+         * Replies to the given message with the specified id<br>
+         * <b>THIS WILL ONLY WORK IF THE BOT HAS READ HISTORY PERMISSION IN THE CHANNEL</b>
          *
          * @param messageId
          *     The message id from a message on discord, set to {@code 0} to disable
@@ -474,7 +477,8 @@ public class MessageConfig {
         }
 
         /**
-         * Replies to the given message with the specified id
+         * Replies to the given message with the specified id<br>
+         * <b>THIS WILL ONLY WORK IF THE BOT HAS READ HISTORY PERMISSION IN THE CHANNEL</b>
          *
          * @param messageId
          *     The message id from a message on discord, set to {@code 0} to disable

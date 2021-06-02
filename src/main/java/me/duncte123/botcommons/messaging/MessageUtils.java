@@ -26,6 +26,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,6 +37,7 @@ import static me.duncte123.botcommons.messaging.EmbedUtils.embedToMessage;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class MessageUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageUtils.class);
     private static String errorReaction = "❌";
     private static String successReaction = "✅";
 
@@ -335,7 +338,7 @@ public class MessageUtils {
             (message) -> {
                 final MessageAction messageAction = channel.sendMessage(message);
 
-                if (config.getReplyToId() > 0) {
+                if (config.getReplyToId() > 0 && guild.getSelfMember().hasPermission(channelById, Permission.MESSAGE_HISTORY)) {
                     messageAction.referenceById(config.getReplyToId())
                         .mentionRepliedUser(config.isMentionRepliedUser());
                 }
