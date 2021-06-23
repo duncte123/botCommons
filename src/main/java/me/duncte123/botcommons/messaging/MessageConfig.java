@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.MessageType;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -219,6 +220,7 @@ public class MessageConfig {
         /**
          * Sets the message content for the message that will be sent.<br/>
          * <b>THIS WILL REPLACE THE CURRENT MESSAGE BUILDER</b>
+         * <p>This method will also attempt to extract the channel and any possible embeds if this information is present.</p>
          *
          * @param message
          *     The message to extract the content from
@@ -233,12 +235,14 @@ public class MessageConfig {
             // clear the embeds
             this.messageBuilder.setEmbeds();
 
-            // set the first embed on our own config
+            // set the channel if we have one
+            if (message.getType() == MessageType.DEFAULT && message.isFromGuild()) {
+                this.setChannel(message.getTextChannel());
+            }
+
+            // set the embeds on our own config, this will always use the raw preset
             if (!message.getEmbeds().isEmpty()) {
-                this.setEmbeds(
-                    true,
-                    new EmbedBuilder(message.getEmbeds().get(0))
-                );
+                this.setEmbeds(message.getEmbeds());
             }
 
             return this;
@@ -297,7 +301,7 @@ public class MessageConfig {
 
         /**
          * Sets the embed for the message.<br/>
-         * <b>NOTE:</b> Parsing will never happen if the text channel is null at the time of calling this method
+         * <b>NOTE:</b> Parsing of colors will never happen if the text channel is null at the time of calling this method
          *
          * @param raw
          *     {@code true} to skip parsing of the guild-colors and other future items, default value is {@code false}
@@ -320,7 +324,7 @@ public class MessageConfig {
             return this.setEmbeds(false, embeds);
         }
 
-        public Builder setMessageEmbeds(@Nonnull List<MessageEmbed> embeds) {
+        public Builder setEmbeds(@Nonnull List<MessageEmbed> embeds) {
             return this.setEmbeds(
                 true,
                 embeds.stream().map(EmbedBuilder::new).collect(Collectors.toList())

@@ -308,17 +308,21 @@ public class MessageUtils {
         final MessageBuilder messageBuilder = config.getMessageBuilder();
         final List<EmbedBuilder> embeds = config.getEmbeds();
 
-        if (!embeds.isEmpty()) {
-            if (guild.getSelfMember().hasPermission(channelById, Permission.MESSAGE_EMBED_LINKS)) {
+        if (!embeds.isEmpty() && guild.getSelfMember().hasPermission(channelById, Permission.MESSAGE_EMBED_LINKS)) {
+            messageBuilder.setEmbeds(
+                embeds.stream().map(EmbedBuilder::build).collect(Collectors.toList())
+            );
+
+            // TODO: keep the text transformer?
+            /*if (guild.getSelfMember().hasPermission(channelById, Permission.MESSAGE_EMBED_LINKS)) {
                 messageBuilder.setEmbeds(
                     embeds.stream().map(EmbedBuilder::build).collect(Collectors.toList())
                 );
             } else {
-                // TODO: keep?
-                /*messageBuilder.append(
+                messageBuilder.append(
                     embedToMessage(embed.build())
-                );*/
-            }
+                );
+            }*/
         }
 
         final Consumer<? super Throwable> failureAction = config.getFailureAction();
