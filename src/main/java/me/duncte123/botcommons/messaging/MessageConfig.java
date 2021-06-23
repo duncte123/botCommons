@@ -63,7 +63,8 @@ public class MessageConfig {
      *     The embeds to send along with the message
      * @param replyToId
      *     A message id to reply to, set to {@code 0} to disable
-     * @param mentionRepliedUser {@code false} to not ping the user in the reply (Default: {@code true})
+     * @param mentionRepliedUser
+     *     {@code false} to not ping the user in the reply (Default: {@code true})
      * @param failureAction
      *     The action that will be invoked when the message sending fails
      * @param successAction
@@ -115,9 +116,9 @@ public class MessageConfig {
     }
 
     /**
-     * Returns the embed that should go under the message
+     * Returns the list of embeds that should go under the message
      *
-     * @return A possibly null embed that should go under the message
+     * @return A possibly empty list of embeds that should go under the message
      */
     @Nonnull
     public List<EmbedBuilder> getEmbeds() {
@@ -191,12 +192,11 @@ public class MessageConfig {
      */
     // TODO: addEmbed and addEmbeds
     public static class Builder {
+        private final List<EmbedBuilder> embeds = new ArrayList<>();
         private MessageBuilder messageBuilder = new MessageBuilder();
         private long replyToId;
         private boolean mentionRepliedUser = MessageAction.isDefaultMentionRepliedUser();
         private TextChannel channel;
-        private final List<EmbedBuilder> embeds = new ArrayList<>();
-
         private Consumer<? super Throwable> failureAction = RestAction.getDefaultFailure();
         private Consumer<? super Message> successAction = RestAction.getDefaultSuccess();
         private Consumer<MessageAction> actionConfig = (a) -> {
@@ -220,7 +220,8 @@ public class MessageConfig {
         /**
          * Sets the message content for the message that will be sent.<br/>
          * <b>THIS WILL REPLACE THE CURRENT MESSAGE BUILDER</b>
-         * <p>This method will also attempt to extract the channel and any possible embeds if this information is present.</p>
+         * <p>This method will also attempt to extract the channel and any possible embeds if this information is
+         * present.</p>
          *
          * @param message
          *     The message to extract the content from
@@ -291,6 +292,8 @@ public class MessageConfig {
          *
          * @return The builder instance, useful for chaining
          *
+         * @see #addEmbed(EmbedBuilder)
+         * @see #addEmbed(boolean, EmbedBuilder)
          * @see #setEmbeds(boolean, EmbedBuilder...)
          * @see #setEmbeds(Collection)
          * @see #setEmbeds(boolean, Collection)
@@ -301,7 +304,8 @@ public class MessageConfig {
 
         /**
          * Sets the embed for the message.<br/>
-         * <b>NOTE:</b> Parsing of colors will never happen if the text channel is null at the time of calling this method
+         * <b>NOTE:</b> Parsing of colors will never happen if the text channel is null at the time of calling this
+         * method
          *
          * @param raw
          *     {@code true} to skip parsing of the guild-colors and other future items, default value is {@code false}
@@ -310,6 +314,8 @@ public class MessageConfig {
          *
          * @return The builder instance, useful for chaining
          *
+         * @see #addEmbed(EmbedBuilder)
+         * @see #addEmbed(boolean, EmbedBuilder)
          * @see #setEmbeds(EmbedBuilder...)
          * @see #setEmbeds(Collection)
          * @see #setEmbeds(boolean, Collection)
@@ -320,10 +326,39 @@ public class MessageConfig {
             return this.setEmbeds(raw, Arrays.asList(embeds));
         }
 
+        /**
+         * Sets the embeds that the message should have
+         *
+         * @param embeds
+         *     The embeds to attach to the message
+         *
+         * @return The builder instance, useful for chaining
+         *
+         * @see #addEmbed(EmbedBuilder)
+         * @see #addEmbed(boolean, EmbedBuilder)
+         * @see #setEmbeds(EmbedBuilder...)
+         * @see #setEmbeds(boolean, EmbedBuilder...)
+         * @see #setEmbeds(boolean, Collection)
+         */
         public Builder setEmbeds(@Nonnull Collection<? extends EmbedBuilder> embeds) {
             return this.setEmbeds(false, embeds);
         }
 
+        /**
+         * Please don't use this method
+         *
+         * @param embeds
+         *     The embeds to set
+         *
+         * @return The builder instance, useful for chaining
+         *
+         * @see #addEmbed(EmbedBuilder)
+         * @see #addEmbed(boolean, EmbedBuilder)
+         * @see #setEmbeds(EmbedBuilder...)
+         * @see #setEmbeds(boolean, EmbedBuilder...)
+         * @see #setEmbeds(Collection)
+         * @see #setEmbeds(boolean, Collection)
+         */
         public Builder setEmbeds(@Nonnull List<MessageEmbed> embeds) {
             return this.setEmbeds(
                 true,
@@ -331,6 +366,22 @@ public class MessageConfig {
             );
         }
 
+        /**
+         * Sets the embeds for the message
+         *
+         * @param raw
+         *     {@code true} to skip parsing of the guild-colors and other future items, default value is {@code false}
+         * @param embeds
+         *     The embeds to set on the message
+         *
+         * @return The builder instance, useful for chaining
+         *
+         * @see #addEmbed(EmbedBuilder)
+         * @see #addEmbed(boolean, EmbedBuilder)
+         * @see #setEmbeds(EmbedBuilder...)
+         * @see #setEmbeds(boolean, EmbedBuilder...)
+         * @see #setEmbeds(Collection)
+         */
         public Builder setEmbeds(boolean raw, @Nonnull Collection<? extends EmbedBuilder> embeds) {
             Checks.noneNull(embeds, "MessageEmbeds");
 
@@ -351,12 +402,43 @@ public class MessageConfig {
             return this;
         }
 
-        public Builder addEmbeds(@Nonnull EmbedBuilder embed) {
+        /**
+         * Adds a single embed to the current embed list
+         *
+         * @param embed
+         *     The embed to add
+         *
+         * @return The builder instance, useful for chaining
+         *
+         * @see #addEmbed(boolean, EmbedBuilder)
+         * @see #setEmbeds(EmbedBuilder...)
+         * @see #setEmbeds(boolean, EmbedBuilder...)
+         * @see #setEmbeds(Collection)
+         * @see #setEmbeds(boolean, Collection)
+         */
+        public Builder addEmbed(@Nonnull EmbedBuilder embed) {
             return this.addEmbed(false, embed);
         }
 
+        /**
+         * Adds a single embed to the current embed list
+         *
+         * @param raw
+         *     {@code true} to skip parsing of the guild-colors and other future items, default value is {@code false}
+         * @param embed
+         *     The embed to add
+         *
+         * @return The builder instance, useful for chaining
+         *
+         * @see #addEmbed(EmbedBuilder)
+         * @see #setEmbeds(EmbedBuilder...)
+         * @see #setEmbeds(boolean, EmbedBuilder...)
+         * @see #setEmbeds(Collection)
+         * @see #setEmbeds(boolean, Collection)
+         */
         public Builder addEmbed(boolean raw, @Nonnull EmbedBuilder embed) {
             Checks.notNull(embed, "embed");
+            Checks.check(this.embeds.size() <= 10, "Cannot have more than 10 embeds in a message!");
 
             // Use raw to skip this parsing
             if (!raw && this.channel != null) {
@@ -402,7 +484,8 @@ public class MessageConfig {
          * Sets the action that is called when the {@link RestAction} fails
          *
          * @param failureAction
-         *     the action that is called when the {@link RestAction} fails, Defaults to {@link RestAction#getDefaultFailure()}
+         *     the action that is called when the {@link RestAction} fails, Defaults to {@link
+         *     RestAction#getDefaultFailure()}
          *
          * @return The builder instance, useful for chaining
          */
@@ -415,7 +498,8 @@ public class MessageConfig {
          * Sets the action that is called when the {@link RestAction} succeeds
          *
          * @param successAction
-         *     the action that is called when the {@link RestAction} succeeds, Defaults to {@link RestAction#getDefaultSuccess()}
+         *     the action that is called when the {@link RestAction} succeeds, Defaults to {@link
+         *     RestAction#getDefaultSuccess()}
          *
          * @return The builder instance, useful for chaining
          */
@@ -473,7 +557,8 @@ public class MessageConfig {
          * @param message
          *     The {@link Message} on discord that you want to reply to, or {@code null} to disable
          * @param mentionRepliedUser
-         *     Set to {@code false} to not ping the user in the reply (Default: {@link MessageAction#isDefaultMentionRepliedUser()})
+         *     Set to {@code false} to not ping the user in the reply (Default: {@link
+         *     MessageAction#isDefaultMentionRepliedUser()})
          *
          * @return The builder instance, useful for chaining
          *
@@ -517,7 +602,8 @@ public class MessageConfig {
          * @param messageId
          *     The message id from a message on discord, set to {@code 0} to disable
          * @param mentionRepliedUser
-         *     Set to {@code false} to not ping the user in the reply (Default: {@link MessageAction#isDefaultMentionRepliedUser()})
+         *     Set to {@code false} to not ping the user in the reply (Default: {@link
+         *     MessageAction#isDefaultMentionRepliedUser()})
          *
          * @return The builder instance, useful for chaining
          *

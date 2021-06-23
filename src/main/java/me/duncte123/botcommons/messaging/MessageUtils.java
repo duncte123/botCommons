@@ -18,13 +18,11 @@ package me.duncte123.botcommons.messaging;
 
 import me.duncte123.botcommons.commands.ICommandContext;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.MessageBuilder.SplitPolicy;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -289,15 +287,21 @@ public class MessageUtils {
      * Sends a message based off the message config
      *
      * @param config
-     *     The config from wha to send the message
+     *     The configuration on how to send the message
      */
     public static void sendMsg(@Nonnull MessageConfig config) {
         final TextChannel channel = config.getChannel();
-        final Guild guild = channel.getGuild();
-        final TextChannel channelById = guild.getTextChannelById(channel.getIdLong());
+        final JDA jda = channel.getJDA();
+        // get fresh entities of both the guild and the channel
+        final Guild guild = jda.getGuildById(channel.getGuild().getIdLong());
+        final TextChannel channelById = jda.getTextChannelById(channel.getIdLong());
 
         if (channelById == null) {
-            throw new IllegalArgumentException("Channel does not seem to exist on Guild#getTextChannelById");
+            throw new IllegalArgumentException("Channel does not seem to exist on JDA#getTextChannelById???");
+        }
+
+        if (guild == null) {
+            throw new IllegalArgumentException("Guild does not seem to exist on JDA#getGuildById???");
         }
 
         // we cannot talk here
@@ -305,10 +309,11 @@ public class MessageUtils {
             return;
         }
 
+        final Member selfMember = guild.getSelfMember();
         final MessageBuilder messageBuilder = config.getMessageBuilder();
         final List<EmbedBuilder> embeds = config.getEmbeds();
 
-        if (!embeds.isEmpty() && guild.getSelfMember().hasPermission(channelById, Permission.MESSAGE_EMBED_LINKS)) {
+        if (!embeds.isEmpty() && selfMember.hasPermission(channelById, Permission.MESSAGE_EMBED_LINKS)) {
             messageBuilder.setEmbeds(
                 embeds.stream().map(EmbedBuilder::build).collect(Collectors.toList())
             );
@@ -333,7 +338,8 @@ public class MessageUtils {
         if (messageBuilder.length() <= Message.MAX_CONTENT_LENGTH) {
             final MessageAction messageAction = channel.sendMessage(messageBuilder.build());
 
-            if (config.getReplyToId() > 0) {
+            if (config.getReplyToId() > 0 && selfMember.hasPermission(channelById, Permission.MESSAGE_HISTORY)) {
+                //noinspection ResultOfMethodCallIgnored
                 messageAction.referenceById(config.getReplyToId())
                     .mentionRepliedUser(config.isMentionRepliedUser());
             }
@@ -347,7 +353,8 @@ public class MessageUtils {
             (message) -> {
                 final MessageAction messageAction = channel.sendMessage(message);
 
-                if (config.getReplyToId() > 0 && guild.getSelfMember().hasPermission(channelById, Permission.MESSAGE_HISTORY)) {
+                if (config.getReplyToId() > 0 && selfMember.hasPermission(channelById, Permission.MESSAGE_HISTORY)) {
+                    //noinspection ResultOfMethodCallIgnored
                     messageAction.referenceById(config.getReplyToId())
                         .mentionRepliedUser(config.isMentionRepliedUser());
                 }
