@@ -31,7 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static me.duncte123.botcommons.messaging.EmbedUtils.embedToMessage;
 
@@ -219,7 +221,7 @@ public class MessageUtils {
     public static void sendEmbed(ICommandContext ctx, EmbedBuilder embed, boolean raw) {
         sendMsg(
             MessageConfig.Builder.fromCtx(ctx)
-                .setEmbed(embed, raw)
+                .setEmbeds(raw, embed)
                 .build()
         );
     }
@@ -267,7 +269,7 @@ public class MessageUtils {
         sendMsg(
             new MessageConfig.Builder()
                 .setChannel(channel)
-                .setEmbed(embed, raw)
+                .setEmbeds(raw, embed)
                 .build()
         );
     }
@@ -304,15 +306,18 @@ public class MessageUtils {
         }
 
         final MessageBuilder messageBuilder = config.getMessageBuilder();
-        final EmbedBuilder embed = config.getEmbed();
+        final List<EmbedBuilder> embeds = config.getEmbeds();
 
-        if (embed != null) {
+        if (!embeds.isEmpty()) {
             if (guild.getSelfMember().hasPermission(channelById, Permission.MESSAGE_EMBED_LINKS)) {
-                messageBuilder.setEmbed(embed.build());
-            } else {
-                messageBuilder.append(
-                    embedToMessage(embed.build())
+                messageBuilder.setEmbeds(
+                    embeds.stream().map(EmbedBuilder::build).collect(Collectors.toList())
                 );
+            } else {
+                // TODO: keep?
+                /*messageBuilder.append(
+                    embedToMessage(embed.build())
+                );*/
             }
         }
 

@@ -18,7 +18,6 @@ package me.duncte123.botcommons.messaging;
 
 import me.duncte123.botcommons.StringUtils;
 import me.duncte123.botcommons.commands.ICommandContext;
-import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -31,15 +30,20 @@ import net.dv8tion.jda.internal.utils.Checks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class MessageConfig {
     private static Function<TextChannel, String> nonceSupplier = (c) -> c.getId() + System.currentTimeMillis();
 
     private final TextChannel channel;
     private final MessageBuilder messageBuilder;
-    private final EmbedBuilder embed;
+    private final List<EmbedBuilder> embeds;
     private final long replyToId;
     private final boolean mentionRepliedUser;
 
@@ -54,8 +58,8 @@ public class MessageConfig {
      *     The text channel that the message will be sent to
      * @param messageBuilder
      *     The message builder that holds the content for the message
-     * @param embed
-     *     An optional embed to send with the message
+     * @param embeds
+     *     The embeds to send along with the message
      * @param replyToId
      *     A message id to reply to, set to {@code 0} to disable
      * @param mentionRepliedUser {@code false} to not ping the user in the reply (Default: {@code true})
@@ -68,17 +72,18 @@ public class MessageConfig {
      *
      * @see Builder
      */
-    public MessageConfig(TextChannel channel, MessageBuilder messageBuilder, EmbedBuilder embed, long replyToId,
+    public MessageConfig(TextChannel channel, MessageBuilder messageBuilder, Collection<? extends EmbedBuilder> embeds, long replyToId,
                          boolean mentionRepliedUser, Consumer<? super Throwable> failureAction,
                          Consumer<? super Message> successAction, Consumer<MessageAction> actionConfig) {
 
         Checks.notNull(channel, "channel");
         Checks.notNull(messageBuilder, "messageBuilder");
         Checks.notNull(actionConfig, "actionConfig");
+        Checks.notNull(embeds, "embeds");
 
         this.channel = channel;
         this.messageBuilder = messageBuilder;
-        this.embed = embed;
+        this.embeds = new ArrayList<>(embeds);
         this.replyToId = replyToId;
         this.mentionRepliedUser = mentionRepliedUser;
         this.failureAction = failureAction;
@@ -113,9 +118,9 @@ public class MessageConfig {
      *
      * @return A possibly null embed that should go under the message
      */
-    @Nullable
-    public EmbedBuilder getEmbed() {
-        return this.embed;
+    @Nonnull
+    public List<EmbedBuilder> getEmbeds() {
+        return this.embeds;
     }
 
     /**
@@ -183,12 +188,13 @@ public class MessageConfig {
     /**
      * Builder class for the message config
      */
+    // TODO: addEmbed and addEmbeds
     public static class Builder {
         private MessageBuilder messageBuilder = new MessageBuilder();
         private long replyToId;
         private boolean mentionRepliedUser = MessageAction.isDefaultMentionRepliedUser();
         private TextChannel channel;
-        private EmbedBuilder embed;
+        private final List<EmbedBuilder> embeds = new ArrayList<>();
 
         private Consumer<? super Throwable> failureAction = RestAction.getDefaultFailure();
         private Consumer<? super Message> successAction = RestAction.getDefaultSuccess();
@@ -224,14 +230,14 @@ public class MessageConfig {
          */
         public Builder setMessage(Message message) {
             this.messageBuilder = new MessageBuilder(message);
-            // clear the embed
-            this.messageBuilder.setEmbed(null);
+            // clear the embeds
+            this.messageBuilder.setEmbeds();
 
             // set the first embed on our own config
             if (!message.getEmbeds().isEmpty()) {
-                this.setEmbed(
-                    new EmbedBuilder(message.getEmbeds().get(0)),
-                    true
+                this.setEmbeds(
+                    true,
+                    new EmbedBuilder(message.getEmbeds().get(0))
                 );
             }
 
@@ -274,65 +280,89 @@ public class MessageConfig {
         }
 
         /**
-         * Sets the embed on a message from a built embed
-         *
-         * @param embed
-         *     The embed to set on the message
-         *
-         * @return The builder instance, useful for chaining
-         *
-         * @see #setEmbed(EmbedBuilder)
-         * @see #setEmbed(EmbedBuilder, boolean)
-         * @deprecated Use the method that takes in an embed builder instead
-         */
-        @Deprecated
-        @ForRemoval(deadline = "2.1.0")
-        public Builder setEmbed(MessageEmbed embed) {
-            final EmbedBuilder builder = new EmbedBuilder(embed);
-            final long guild = channel.getGuild().getIdLong();
-
-            builder.setColor(EmbedUtils.getColorOrDefault(guild));
-
-            this.embed = builder;
-            return this;
-        }
-
-        /**
          * Sets the embed for the message
          *
-         * @param embed
-         *     The embed to set on the message
+         * @param embeds
+         *     The embeds to set on the message
          *
          * @return The builder instance, useful for chaining
          *
-         * @see #setEmbed(EmbedBuilder, boolean)
+         * @see #setEmbeds(boolean, EmbedBuilder...)
+         * @see #setEmbeds(Collection)
+         * @see #setEmbeds(boolean, Collection)
          */
-        public Builder setEmbed(@Nullable EmbedBuilder embed) {
-            return this.setEmbed(embed, false);
+        public Builder setEmbeds(@Nonnull EmbedBuilder... embeds) {
+            return this.setEmbeds(false, embeds);
         }
 
         /**
          * Sets the embed for the message.<br/>
          * <b>NOTE:</b> Parsing will never happen if the text channel is null at the time of calling this method
          *
-         * @param embed
-         *     The embed on the message
          * @param raw
          *     {@code true} to skip parsing of the guild-colors and other future items, default value is {@code false}
+         * @param embeds
+         *     The embeds on the message
          *
          * @return The builder instance, useful for chaining
          *
-         * @see #setEmbed(EmbedBuilder)
+         * @see #setEmbeds(EmbedBuilder...)
+         * @see #setEmbeds(Collection)
+         * @see #setEmbeds(boolean, Collection)
          */
-        public Builder setEmbed(@Nullable EmbedBuilder embed, boolean raw) {
+        public Builder setEmbeds(boolean raw, @Nonnull EmbedBuilder... embeds) {
+            Checks.noneNull(embeds, "MessageEmbeds");
+
+            return this.setEmbeds(raw, Arrays.asList(embeds));
+        }
+
+        public Builder setEmbeds(@Nonnull Collection<? extends EmbedBuilder> embeds) {
+            return this.setEmbeds(false, embeds);
+        }
+
+        public Builder setMessageEmbeds(@Nonnull List<MessageEmbed> embeds) {
+            return this.setEmbeds(
+                true,
+                embeds.stream().map(EmbedBuilder::new).collect(Collectors.toList())
+            );
+        }
+
+        public Builder setEmbeds(boolean raw, @Nonnull Collection<? extends EmbedBuilder> embeds) {
+            Checks.noneNull(embeds, "MessageEmbeds");
+
+            Checks.check(embeds.size() <= 10, "Cannot have more than 10 embeds in a message!");
+
             // Use raw to skip this parsing
-            if (embed != null && !raw && this.channel != null) {
+            if (!raw && this.channel != null) {
+                final long guild = this.channel.getGuild().getIdLong();
+
+                for (final EmbedBuilder embedBuilder : embeds) {
+                    embedBuilder.setColor(EmbedUtils.getColorOrDefault(guild));
+                }
+            }
+
+            this.embeds.clear();
+            this.embeds.addAll(embeds);
+
+            return this;
+        }
+
+        public Builder addEmbeds(@Nonnull EmbedBuilder embed) {
+            return this.addEmbed(false, embed);
+        }
+
+        public Builder addEmbed(boolean raw, @Nonnull EmbedBuilder embed) {
+            Checks.notNull(embed, "embed");
+
+            // Use raw to skip this parsing
+            if (!raw && this.channel != null) {
                 final long guild = this.channel.getGuild().getIdLong();
 
                 embed.setColor(EmbedUtils.getColorOrDefault(guild));
             }
 
-            this.embed = embed;
+            this.embeds.add(embed);
+
             return this;
         }
 
@@ -344,7 +374,7 @@ public class MessageConfig {
          * @see #configureMessageBuilder(Consumer)
          */
         public MessageBuilder getMessageBuilder() {
-            return messageBuilder;
+            return this.messageBuilder;
         }
 
         /**
@@ -510,14 +540,16 @@ public class MessageConfig {
             }
 
             // we can send messages with just an embed
-            if (this.messageBuilder.isEmpty() && this.embed == null) {
-                throw new IllegalArgumentException("This message has no content, please add some content with setMessage or setEmbed");
+            if (this.messageBuilder.isEmpty() && this.embeds.isEmpty()) {
+                throw new IllegalArgumentException("This message has no content, please add some content with setMessage or setEmbeds");
             }
+
+            Checks.check(this.embeds.size() <= 10, "Cannot have more than 10 embeds in a message!");
 
             return new MessageConfig(
                 this.channel,
                 this.messageBuilder,
-                this.embed,
+                this.embeds,
                 this.replyToId,
                 this.mentionRepliedUser,
                 this.failureAction,

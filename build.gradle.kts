@@ -21,7 +21,7 @@ plugins {
 }
 
 group = "me.duncte123"
-version = "${getVersionPrefix()}2.2.${getBuildNum()}"
+version = "${getVersionPrefix()}2.3.${getBuildNum()}"
 val archivesBaseName = "botCommons"
 
 repositories {
@@ -35,6 +35,8 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+val jdaVersion = "4.3.0_282"
+
 dependencies {
     api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.10.1")
     api(group = "org.jsoup", name = "jsoup", version = "1.13.1")
@@ -44,11 +46,11 @@ dependencies {
     }
 
     compileOnly(group = "org.json", name = "json", version = "20180813") // Provided by the user
-    compileOnly(group = "net.dv8tion", name = "JDA", version = "4.2.0_252") {
+    compileOnly(group = "net.dv8tion", name = "JDA", version = jdaVersion) {
         exclude(module = "opus-java")
     }
 
-    testImplementation (group = "net.dv8tion", name = "JDA", version = "4.2.0_252") {
+    testImplementation (group = "net.dv8tion", name = "JDA", version = jdaVersion) {
         exclude(module = "opus-java")
     }
     testImplementation(group = "junit", name = "junit", version = "4.12")
