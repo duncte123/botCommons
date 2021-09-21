@@ -325,9 +325,13 @@ public class MessageUtils {
                 );
             } else {
                 messageBuilder.append(
-                    embedToMessage(embed.build())
+                    embedToMessage(embeds.get(0).build())
                 );
             }*/
+        }
+
+        if (messageBuilder.isEmpty()) {
+            return;
         }
 
         final Consumer<? super Throwable> failureAction = config.getFailureAction();
