@@ -419,6 +419,20 @@ public final class WebUtils extends Reliqua {
             .get(0);
     }
 
+    public PendingRequestBuilder prepareBuilder(Request.Builder builder, @Nullable PendingRequestFunction fn1, @Nullable RequestBuilderFunction fn2) {
+        if (fn2 != null) {
+            builder = fn2.apply(builder);
+        }
+
+        PendingRequestBuilder pendingRequestBuilder = createRequest(builder);
+
+        if (fn1 != null) {
+            pendingRequestBuilder = fn1.apply(pendingRequestBuilder);
+        }
+
+        return pendingRequestBuilder;
+    }
+
     /**
      *
      * @param request
