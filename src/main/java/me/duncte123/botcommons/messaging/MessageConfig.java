@@ -659,7 +659,7 @@ public class MessageConfig {
          * @see me.duncte123.botcommons.commands.DefaultCommandContext
          */
         public static Builder fromCtx(ICommandContext ctx) {
-            return new Builder().setChannel(ctx.getChannel());
+            return new Builder().setChannel(ctx.getChannel()).replyTo(ctx.getMessage());
         }
 
         /**
@@ -671,7 +671,7 @@ public class MessageConfig {
          * @return A builder instance that was created from a {@link GuildMessageReceivedEvent}
          */
         public static Builder fromEvent(GuildMessageReceivedEvent event) {
-            return new Builder().setChannel(event.getChannel());
+            return new Builder().setChannel(event.getChannel()).replyTo(event.getMessage());
         }
     }
 }
