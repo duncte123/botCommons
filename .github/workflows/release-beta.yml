@@ -28,4 +28,5 @@ jobs:
                     USERNAME: ${{ secrets.M2_USER }}
                     PASSWORD: ${{ secrets.M2_PASS }}
                     VERSION_PREFIX: beta_
+                    DEPLOY_PATH: snapshots
                 run: ./gradlew --no-daemon publish -x test

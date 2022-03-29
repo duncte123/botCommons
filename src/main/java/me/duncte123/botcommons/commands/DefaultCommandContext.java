@@ -16,7 +16,7 @@
 
 package me.duncte123.botcommons.commands;
 
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.internal.utils.Checks;
 
 import java.util.List;
@@ -25,10 +25,10 @@ import java.util.List;
  * Provides a basic command context that should be sufficient for most bots
  */
 public class DefaultCommandContext implements ICommandContext {
-    private final GuildMessageReceivedEvent event;
+    private final MessageReceivedEvent event;
     private final List<String> args;
 
-    public DefaultCommandContext(List<String> args, GuildMessageReceivedEvent event) {
+    public DefaultCommandContext(List<String> args, MessageReceivedEvent event) {
         Checks.notNull(event, "event");
         Checks.notNull(args, "args");
 
@@ -41,7 +41,7 @@ public class DefaultCommandContext implements ICommandContext {
     }
 
     @Override
-    public GuildMessageReceivedEvent getEvent() {
+    public MessageReceivedEvent getEvent() {
         return this.event;
     }
 }

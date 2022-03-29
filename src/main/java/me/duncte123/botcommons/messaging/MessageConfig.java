@@ -20,11 +20,8 @@ import me.duncte123.botcommons.StringUtils;
 import me.duncte123.botcommons.commands.ICommandContext;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.MessageType;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.internal.utils.Checks;
@@ -40,9 +37,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MessageConfig {
-    private static Function<TextChannel, String> nonceSupplier = (c) -> c.getId() + System.currentTimeMillis();
+    private static Function<MessageChannel, String> nonceSupplier = (c) -> c.getId() + System.currentTimeMillis();
 
-    private final TextChannel channel;
+    private final MessageChannel channel;
     private final MessageBuilder messageBuilder;
     private final List<EmbedBuilder> embeds;
     private final long replyToId;
@@ -74,7 +71,7 @@ public class MessageConfig {
      *
      * @see Builder
      */
-    public MessageConfig(TextChannel channel, MessageBuilder messageBuilder, Collection<? extends EmbedBuilder> embeds, long replyToId,
+    public MessageConfig(MessageChannel channel, MessageBuilder messageBuilder, Collection<? extends EmbedBuilder> embeds, long replyToId,
                          boolean mentionRepliedUser, Consumer<? super Throwable> failureAction,
                          Consumer<? super Message> successAction, Consumer<MessageAction> actionConfig) {
 
@@ -101,7 +98,7 @@ public class MessageConfig {
      *
      * @return The text channel that the message will be sent in
      */
-    public TextChannel getChannel() {
+    public MessageChannel getChannel() {
         return this.channel;
     }
 
@@ -178,10 +175,10 @@ public class MessageConfig {
      * A nonce can be used to verify if the message you recieve is the message you want
      *
      * @param nonceSupplier
-     *     A function that returns the nonce, by default this is the {@link TextChannel#getId() channel id} combined
+     *     A function that returns the nonce, by default this is the {@link MessageChannel#getId() channel id} combined
      *     with the {@link System#currentTimeMillis() current time in milliseconds}
      */
-    public static void setNonceSupplier(Function<TextChannel, String> nonceSupplier) {
+    public static void setNonceSupplier(Function<MessageChannel, String> nonceSupplier) {
         Checks.notNull(nonceSupplier, "nonceSupplier");
 
         MessageConfig.nonceSupplier = nonceSupplier;
@@ -196,7 +193,7 @@ public class MessageConfig {
         private MessageBuilder messageBuilder = new MessageBuilder();
         private long replyToId;
         private boolean mentionRepliedUser = MessageAction.isDefaultMentionRepliedUser();
-        private TextChannel channel;
+        private MessageChannel channel;
         private Consumer<? super Throwable> failureAction = RestAction.getDefaultFailure();
         private Consumer<? super Message> successAction = RestAction.getDefaultSuccess();
         private Consumer<MessageAction> actionConfig = (a) -> {
@@ -210,7 +207,7 @@ public class MessageConfig {
          *
          * @return The builder instance, useful for chaining
          */
-        public Builder setChannel(@Nonnull TextChannel channel) {
+        public Builder setChannel(@Nonnull MessageChannel channel) {
             Checks.notNull(channel, "channel");
 
             this.channel = channel;
@@ -388,8 +385,8 @@ public class MessageConfig {
             Checks.check(embeds.size() <= 10, "Cannot have more than 10 embeds in a message!");
 
             // Use raw to skip this parsing
-            if (!raw && this.channel != null) {
-                final long guild = this.channel.getGuild().getIdLong();
+            if (!raw && this.channel != null && this.channel instanceof GuildMessageChannel) {
+                final long guild = ((GuildMessageChannel) this.channel).getGuild().getIdLong();
 
                 for (final EmbedBuilder embedBuilder : embeds) {
                     embedBuilder.setColor(EmbedUtils.getColorOrDefault(guild));
@@ -441,8 +438,8 @@ public class MessageConfig {
             Checks.check(this.embeds.size() <= 10, "Cannot have more than 10 embeds in a message!");
 
             // Use raw to skip this parsing
-            if (!raw && this.channel != null) {
-                final long guild = this.channel.getGuild().getIdLong();
+            if (!raw && this.channel != null && this.channel instanceof GuildMessageChannel) {
+                final long guild = ((GuildMessageChannel) this.channel).getGuild().getIdLong();
 
                 embed.setColor(EmbedUtils.getColorOrDefault(guild));
             }
@@ -666,11 +663,11 @@ public class MessageConfig {
          * Creates a config builder instance from a JDA guild message received event
          *
          * @param event
-         *     A {@link GuildMessageReceivedEvent} from JDA to get the text channel from
+         *     A {@link MessageReceivedEvent} from JDA to get the text channel from
          *
-         * @return A builder instance that was created from a {@link GuildMessageReceivedEvent}
+         * @return A builder instance that was created from a {@link MessageReceivedEvent}
          */
-        public static Builder fromEvent(GuildMessageReceivedEvent event) {
+        public static Builder fromEvent(MessageReceivedEvent event) {
             return new Builder().setChannel(event.getChannel()).replyTo(event.getMessage());
         }
     }

@@ -21,7 +21,7 @@ plugins {
 }
 
 group = "me.duncte123"
-version = "${getVersionPrefix()}2.3.${getBuildNum()}"
+version = "${getVersionPrefix()}3.0.${getBuildNum()}"
 val archivesBaseName = "botCommons"
 
 repositories {
@@ -36,7 +36,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-val jdaVersion = "4.4.0_352"
+val jdaVersion = "5.0.0-alpha.9"
 
 dependencies {
     api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.10.1")
@@ -67,6 +67,10 @@ fun getVersionPrefix(): String {
     return System.getenv("VERSION_PREFIX") ?: ""
 }
 
+fun getDeployPath(): String {
+    return System.getenv("DEPLOY_PATH") ?: "releases"
+}
+
 val compileJava: JavaCompile by tasks
 val javadoc: Javadoc by tasks
 val jar: Jar by tasks
@@ -94,7 +98,7 @@ publishing {
     repositories {
         maven {
             name = "duncte123-m2"
-            url = uri("https://m2.duncte123.dev/releases")
+            url = uri("https://m2.duncte123.dev/${getDeployPath()}")
             credentials {
                 username = System.getenv("USERNAME")
                 password = System.getenv("PASSWORD")

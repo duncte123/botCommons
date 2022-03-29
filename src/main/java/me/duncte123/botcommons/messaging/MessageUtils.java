@@ -290,18 +290,13 @@ public class MessageUtils {
      *     The configuration on how to send the message
      */
     public static void sendMsg(@Nonnull MessageConfig config) {
-        final TextChannel channel = config.getChannel();
+        final MessageChannel channel = config.getChannel();
         final JDA jda = channel.getJDA();
-        // get fresh entities of both the guild and the channel
-        final Guild guild = jda.getGuildById(channel.getGuild().getIdLong());
-        final TextChannel channelById = jda.getTextChannelById(channel.getIdLong());
+        // refresh the entity
+        final MessageChannel channelById = jda.getChannelById(MessageChannel.class, channel.getIdLong());
 
         if (channelById == null) {
             throw new IllegalArgumentException("Channel does not seem to exist on JDA#getTextChannelById???");
-        }
-
-        if (guild == null) {
-            throw new IllegalArgumentException("Guild does not seem to exist on JDA#getGuildById???");
         }
 
         // we cannot talk here
@@ -309,25 +304,42 @@ public class MessageUtils {
             return;
         }
 
-        final Member selfMember = guild.getSelfMember();
+        boolean canReply = true;
         final MessageBuilder messageBuilder = config.getMessageBuilder();
         final List<EmbedBuilder> embeds = config.getEmbeds();
 
-        if (!embeds.isEmpty() && selfMember.hasPermission(channelById, Permission.MESSAGE_EMBED_LINKS)) {
-            messageBuilder.setEmbeds(
-                embeds.stream().map(EmbedBuilder::build).collect(Collectors.toList())
-            );
+        if (channelById instanceof GuildMessageChannel) {
+            final GuildMessageChannel chan = (GuildMessageChannel) channelById;
+            final Guild guild = jda.getGuildById(chan.getGuild().getIdLong());
 
-            // TODO: keep the text transformer?
-            /*if (guild.getSelfMember().hasPermission(channelById, Permission.MESSAGE_EMBED_LINKS)) {
+            if (guild == null) {
+                throw new IllegalArgumentException("Guild does not seem to exist on JDA#getGuildById???");
+            }
+
+            final Member selfMember = guild.getSelfMember();
+
+            if (!embeds.isEmpty() && selfMember.hasPermission(chan, Permission.MESSAGE_EMBED_LINKS)) {
                 messageBuilder.setEmbeds(
                     embeds.stream().map(EmbedBuilder::build).collect(Collectors.toList())
                 );
-            } else {
-                messageBuilder.append(
-                    embedToMessage(embeds.get(0).build())
-                );
-            }*/
+
+                // TODO: keep the text transformer?
+                /*if (guild.getSelfMember().hasPermission(channelById, Permission.MESSAGE_EMBED_LINKS)) {
+                    messageBuilder.setEmbeds(
+                        embeds.stream().map(EmbedBuilder::build).collect(Collectors.toList())
+                    );
+                } else {
+                    messageBuilder.append(
+                        embedToMessage(embeds.get(0).build())
+                    );
+                }*/
+            }
+
+            canReply = selfMember.hasPermission(chan, Permission.MESSAGE_HISTORY);
+        } else {
+            messageBuilder.setEmbeds(
+                embeds.stream().map(EmbedBuilder::build).collect(Collectors.toList())
+            );
         }
 
         if (messageBuilder.isEmpty()) {
@@ -337,12 +349,13 @@ public class MessageUtils {
         final Consumer<? super Throwable> failureAction = config.getFailureAction();
         final Consumer<? super Message> successAction = config.getSuccessAction();
         final Consumer<MessageAction> actionConfig = config.getActionConfig();
+        final boolean finalCanReply = canReply; // fuck java 8 :(
 
         // if the message is small enough we can just send it
         if (messageBuilder.length() <= Message.MAX_CONTENT_LENGTH) {
             final MessageAction messageAction = channel.sendMessage(messageBuilder.build());
 
-            if (config.getReplyToId() > 0 && selfMember.hasPermission(channelById, Permission.MESSAGE_HISTORY)) {
+            if (config.getReplyToId() > 0 && finalCanReply) {
                 //noinspection ResultOfMethodCallIgnored
                 messageAction.referenceById(config.getReplyToId())
                     .mentionRepliedUser(config.isMentionRepliedUser());
@@ -357,7 +370,7 @@ public class MessageUtils {
             (message) -> {
                 final MessageAction messageAction = channel.sendMessage(message);
 
-                if (config.getReplyToId() > 0 && selfMember.hasPermission(channelById, Permission.MESSAGE_HISTORY)) {
+                if (config.getReplyToId() > 0 && finalCanReply) {
                     //noinspection ResultOfMethodCallIgnored
                     messageAction.referenceById(config.getReplyToId())
                         .mentionRepliedUser(config.isMentionRepliedUser());

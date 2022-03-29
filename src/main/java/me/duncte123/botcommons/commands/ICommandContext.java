@@ -16,10 +16,10 @@
 
 package me.duncte123.botcommons.commands;
 
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 /**
  * Dummy class that holds the basics for a command context
@@ -36,18 +36,27 @@ public interface ICommandContext {
     }
 
     /**
-     * Returns the {@link net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent message event} that was received for this instance
+     * Returns true if this message event came from a guild
      *
-     * @return the {@link net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent message event} that was received for this instance
+     * @return true if this message event came from a guild
      */
-    GuildMessageReceivedEvent getEvent();
+    default boolean isFromGuild() {
+        return this.getEvent().isFromGuild();
+    }
 
     /**
-     * Returns the {@link net.dv8tion.jda.api.entities.TextChannel channel} that the message for this event was send in
+     * Returns the {@link net.dv8tion.jda.api.events.message.MessageReceivedEvent message event} that was received for this instance
      *
-     * @return the {@link net.dv8tion.jda.api.entities.TextChannel channel} that the message for this event was send in
+     * @return the {@link net.dv8tion.jda.api.events.message.MessageReceivedEvent message event} that was received for this instance
      */
-    default TextChannel getChannel() {
+    MessageReceivedEvent getEvent();
+
+    /**
+     * Returns the {@link net.dv8tion.jda.api.entities.MessageChannel channel} that the message for this event was sent in
+     *
+     * @return the {@link net.dv8tion.jda.api.entities.MessageChannel channel} that the message for this event was sent in
+     */
+    default MessageChannel getChannel() {
         return this.getEvent().getChannel();
     }
 
