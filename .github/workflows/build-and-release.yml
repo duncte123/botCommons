@@ -25,6 +25,6 @@ jobs:
         run: ./gradlew --no-daemon dependencies
       - name: Build and Release with Gradle
         env:
-          JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
-          JFROG_TOKEN: ${{ secrets.JFROG_TOKEN }}
+            USERNAME: ${{ secrets.M2_USER }}
+            PASSWORD: ${{ secrets.M2_PASS }}
         run: ./gradlew --no-daemon publish -x test

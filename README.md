@@ -20,8 +20,8 @@ This method also accepts your JDA or ShardManager instance for killing the threa
 ```GRADLE
 repositories {
     maven {
-        name 'duncte123-jfrog'
-        url 'https://duncte123.jfrog.io/artifactory/maven'
+        name 'm2-duncte123'
+        url 'https://m2.duncte123.dev/releases'
     }
 }
 
@@ -34,9 +34,9 @@ dependencies {
 
 ```XML
 <repository>
-    <id>jfrog-duncte123</id>
-    <name>jfrog-duncte123</name>
-    <url>https://duncte123.jfrog.io/artifactory/maven</url>
+    <id>m2-duncte123</id>
+    <name>m2-duncte123</name>
+    <url>https://m2.duncte123.dev/releases</url>
 </repository>
 
 <dependency>
@@ -49,8 +49,8 @@ dependencies {
 Make sure to replace `[VERSION]` with the version listed above.
 
 [JDA]: https://github.com/DV8FromTheWorld/JDA
-[version]: https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fduncte123.jfrog.io%2Fartifactory%2Fmaven%2Fme%2Fduncte123%2FbotCommons%2Fmaven-metadata.xml
-[download]: https://duncte123.jfrog.io/ui/packages/gav:%2F%2Fme.duncte123:botCommons
+[version]: https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fm2.duncte123.dev%2Freleases%2Fme%2Fduncte123%2FbotCommons%2Fmaven-metadata.xml
+[download]: https://m2.duncte123.dev/#/releases/me/duncte123/botCommons
 [usage]: USAGE.md
 [circleLink]: https://github.com/duncte123/botCommons
 [circleImage]: https://github.com/duncte123/botCommons/workflows/release-botcommons/badge.svg

@@ -27,6 +27,7 @@ val archivesBaseName = "botCommons"
 repositories {
     mavenCentral()
     maven("https://m2.dv8tion.net/releases")
+    maven("https://m2.duncte123.dev/releases")
     maven("https://duncte123.jfrog.io/artifactory/maven")
 }
 
@@ -92,16 +93,16 @@ val javadocJar = task<Jar>("javadocJar") {
 publishing {
     repositories {
         maven {
-            name = "jfrog"
-            url = uri("https://duncte123.jfrog.io/artifactory/maven/")
+            name = "duncte123-m2"
+            url = uri("https://m2.duncte123.dev/releases")
             credentials {
-                username = System.getenv("JFROG_USERNAME")
-                password = System.getenv("JFROG_TOKEN")
+                username = System.getenv("USERNAME")
+                password = System.getenv("PASSWORD")
             }
         }
     }
     publications {
-        create<MavenPublication>("jfrog") {
+        create<MavenPublication>("duncte123-m2") {
             from(components["java"])
 
             artifactId = archivesBaseName
