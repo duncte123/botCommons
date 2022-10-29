@@ -19,11 +19,14 @@ package me.duncte123.botcommons.messaging;
 import me.duncte123.botcommons.StringUtils;
 import me.duncte123.botcommons.commands.ICommandContext;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageRequest;
 import net.dv8tion.jda.internal.utils.Checks;
 
 import javax.annotation.Nonnull;
@@ -37,17 +40,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MessageConfig {
-    private static Function<MessageChannel, String> nonceSupplier = (c) -> c.getId() + System.currentTimeMillis();
+    private static Function<MessageChannelUnion, String> nonceSupplier = (c) -> c.getId() + System.currentTimeMillis();
 
-    private final MessageChannel channel;
-    private final MessageBuilder messageBuilder;
+    private final MessageChannelUnion channel;
+    private final MessageCreateBuilder messageBuilder;
     private final List<EmbedBuilder> embeds;
     private final long replyToId;
     private final boolean mentionRepliedUser;
 
     private final Consumer<? super Throwable> failureAction;
     private final Consumer<? super Message> successAction;
-    private final Consumer<MessageAction> actionConfig;
+    private final Consumer<MessageCreateAction> actionConfig;
 
     /**
      * Constructs a new instacne of the message config, it is better to use the {@link Builder builder}
@@ -71,9 +74,9 @@ public class MessageConfig {
      *
      * @see Builder
      */
-    public MessageConfig(MessageChannel channel, MessageBuilder messageBuilder, Collection<? extends EmbedBuilder> embeds, long replyToId,
+    public MessageConfig(MessageChannelUnion channel, MessageCreateBuilder messageBuilder, Collection<? extends EmbedBuilder> embeds, long replyToId,
                          boolean mentionRepliedUser, Consumer<? super Throwable> failureAction,
-                         Consumer<? super Message> successAction, Consumer<MessageAction> actionConfig) {
+                         Consumer<? super Message> successAction, Consumer<MessageCreateAction> actionConfig) {
 
         Checks.notNull(channel, "channel");
         Checks.notNull(messageBuilder, "messageBuilder");
@@ -88,9 +91,6 @@ public class MessageConfig {
         this.failureAction = failureAction;
         this.successAction = successAction;
         this.actionConfig = actionConfig;
-
-        // Set the nonce for the message
-        this.messageBuilder.setNonce(nonceSupplier.apply(channel));
     }
 
     /**
@@ -98,7 +98,7 @@ public class MessageConfig {
      *
      * @return The text channel that the message will be sent in
      */
-    public MessageChannel getChannel() {
+    public MessageChannelUnion getChannel() {
         return this.channel;
     }
 
@@ -108,7 +108,7 @@ public class MessageConfig {
      *
      * @return The message builder that holds the contents for the message
      */
-    public MessageBuilder getMessageBuilder() {
+    public MessageCreateBuilder getMessageBuilder() {
         return this.messageBuilder;
     }
 
@@ -159,14 +159,11 @@ public class MessageConfig {
     }
 
     /**
-     * Returns the {@link MessageAction} for you to configure (eg append some content or override the nonce)
+     * Returns the {@link MessageCreateAction} for you to configure (eg append some content or override the nonce)
      *
-     * @return The {@link MessageAction} for you to configure (eg append some content or override the nonce)
-     *
-     * @see MessageAction#append(CharSequence)
-     * @see MessageAction#nonce(String)
+     * @return The {@link MessageCreateAction} for you to configure (eg append some content or override the nonce)
      */
-    public Consumer<MessageAction> getActionConfig() {
+    public Consumer<MessageCreateAction> getActionConfig() {
         return this.actionConfig;
     }
 
@@ -175,10 +172,10 @@ public class MessageConfig {
      * A nonce can be used to verify if the message you recieve is the message you want
      *
      * @param nonceSupplier
-     *     A function that returns the nonce, by default this is the {@link MessageChannel#getId() channel id} combined
+     *     A function that returns the nonce, by default this is the {@link MessageChannelUnion#getId() channel id} combined
      *     with the {@link System#currentTimeMillis() current time in milliseconds}
      */
-    public static void setNonceSupplier(Function<MessageChannel, String> nonceSupplier) {
+    public static void setNonceSupplier(Function<MessageChannelUnion, String> nonceSupplier) {
         Checks.notNull(nonceSupplier, "nonceSupplier");
 
         MessageConfig.nonceSupplier = nonceSupplier;
@@ -190,13 +187,13 @@ public class MessageConfig {
     // TODO: addEmbed and addEmbeds
     public static class Builder {
         private final List<EmbedBuilder> embeds = new ArrayList<>();
-        private MessageBuilder messageBuilder = new MessageBuilder();
+        private MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
         private long replyToId;
-        private boolean mentionRepliedUser = MessageAction.isDefaultMentionRepliedUser();
-        private MessageChannel channel;
+        private boolean mentionRepliedUser = MessageRequest.isDefaultMentionRepliedUser();
+        private MessageChannelUnion channel;
         private Consumer<? super Throwable> failureAction = RestAction.getDefaultFailure();
         private Consumer<? super Message> successAction = RestAction.getDefaultSuccess();
-        private Consumer<MessageAction> actionConfig = (a) -> {
+        private Consumer<MessageCreateAction> actionConfig = (a) -> {
         };
 
         /**
@@ -207,7 +204,7 @@ public class MessageConfig {
          *
          * @return The builder instance, useful for chaining
          */
-        public Builder setChannel(@Nonnull MessageChannel channel) {
+        public Builder setChannel(@Nonnull MessageChannelUnion channel) {
             Checks.notNull(channel, "channel");
 
             this.channel = channel;
@@ -229,13 +226,13 @@ public class MessageConfig {
          * @see #setMessageFormat(String, Object...)
          */
         public Builder setMessage(Message message) {
-            this.messageBuilder = new MessageBuilder(message);
+            this.messageBuilder = MessageCreateBuilder.fromMessage(message);
             // clear the embeds
             this.messageBuilder.setEmbeds();
 
             // set the channel if we have one
             if (message.getType() == MessageType.DEFAULT && message.isFromGuild()) {
-                this.setChannel(message.getTextChannel());
+                this.setChannel(message.getChannel());
             }
 
             // set the embeds on our own config, this will always use the raw preset
@@ -456,7 +453,7 @@ public class MessageConfig {
          *
          * @see #configureMessageBuilder(Consumer)
          */
-        public MessageBuilder getMessageBuilder() {
+        public MessageCreateBuilder getMessageBuilder() {
             return this.messageBuilder;
         }
 
@@ -470,7 +467,7 @@ public class MessageConfig {
          *
          * @see #getMessageBuilder()
          */
-        public Builder configureMessageBuilder(@Nonnull Consumer<MessageBuilder> consumer) {
+        public Builder configureMessageBuilder(@Nonnull Consumer<MessageCreateBuilder> consumer) {
             Checks.notNull(consumer, "consumer");
 
             consumer.accept(this.messageBuilder);
@@ -506,18 +503,16 @@ public class MessageConfig {
         }
 
         /**
-         * Sets the {@link MessageAction} for you to configure (eg append some content or override the nonce)
+         * Sets the {@link MessageCreateAction} for you to configure (eg append some content or override the nonce)
          *
          * @param actionConfig
-         *     the {@link MessageAction} for you to configure (eg append some content or override the nonce)
+         *     the {@link MessageCreateAction} for you to configure (eg append some content or override the nonce)
          *
          * @return The builder instance, useful for chaining
          *
-         * @see MessageAction#append(CharSequence)
-         * @see MessageAction#nonce(String)
-         * @see MessageAction
+         * @see MessageCreateAction
          */
-        public Builder setActionConfig(@Nonnull Consumer<MessageAction> actionConfig) {
+        public Builder setActionConfig(@Nonnull Consumer<MessageCreateAction> actionConfig) {
             Checks.notNull(actionConfig, "actionConfig");
 
             this.actionConfig = actionConfig;
@@ -555,7 +550,7 @@ public class MessageConfig {
          *     The {@link Message} on discord that you want to reply to, or {@code null} to disable
          * @param mentionRepliedUser
          *     Set to {@code false} to not ping the user in the reply (Default: {@link
-         *     MessageAction#isDefaultMentionRepliedUser()})
+         *     MessageRequest#isDefaultMentionRepliedUser()})
          *
          * @return The builder instance, useful for chaining
          *
@@ -600,7 +595,7 @@ public class MessageConfig {
          *     The message id from a message on discord, set to {@code 0} to disable
          * @param mentionRepliedUser
          *     Set to {@code false} to not ping the user in the reply (Default: {@link
-         *     MessageAction#isDefaultMentionRepliedUser()})
+         *     MessageRequest#isDefaultMentionRepliedUser()})
          *
          * @return The builder instance, useful for chaining
          *
@@ -641,7 +636,11 @@ public class MessageConfig {
                 this.mentionRepliedUser,
                 this.failureAction,
                 this.successAction,
-                this.actionConfig
+                (config) -> {
+                    // Set the nonce for the message
+                    config.setNonce(nonceSupplier.apply(this.channel));
+                    this.actionConfig.accept(config);
+                }
             );
         }
 

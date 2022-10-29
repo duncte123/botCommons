@@ -16,6 +16,7 @@
 
 package me.duncte123.botcommons.commands;
 
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.JDA;
@@ -52,11 +53,11 @@ public interface ICommandContext {
     MessageReceivedEvent getEvent();
 
     /**
-     * Returns the {@link net.dv8tion.jda.api.entities.MessageChannel channel} that the message for this event was sent in
+     * Returns the {@link net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion channel} that the message for this event was sent in
      *
-     * @return the {@link net.dv8tion.jda.api.entities.MessageChannel channel} that the message for this event was sent in
+     * @return the {@link net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion channel} that the message for this event was sent in
      */
-    default MessageChannel getChannel() {
+    default MessageChannelUnion getChannel() {
         return this.getEvent().getChannel();
     }
 

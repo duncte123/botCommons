@@ -19,11 +19,17 @@ package me.duncte123.botcommons.messaging;
 import me.duncte123.botcommons.commands.ICommandContext;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.MessageBuilder.SplitPolicy;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +60,7 @@ public class MessageUtils {
 
     /**
      * Sets the new error reaction<br/>
-     * Hint: To use a custom emote as reaction use {@link net.dv8tion.jda.api.entities.Emote#getAsMention()}
+     * Hint: To use a custom emote as reaction use {@link Emoji#getAsReactionCode()}
      *
      * @param errorReaction
      *     The new emoji/emote to use for error reactions.
@@ -78,7 +84,7 @@ public class MessageUtils {
 
     /**
      * Sets the new success reaction.<br/>
-     * Hint: To use a custom emote as reaction use {@link net.dv8tion.jda.api.entities.Emote#getAsMention()}
+     * Hint: To use a custom emote as reaction use {@link Emoji#getAsReactionCode()}
      *
      * @param successReaction
      *     The new emoji/emote to use as success reaction
@@ -97,15 +103,14 @@ public class MessageUtils {
      */
     public static void sendError(Message message) {
         if (message.getChannelType() == ChannelType.TEXT) {
-            TextChannel channel = message.getTextChannel();
+            TextChannel channel = message.getChannel().asTextChannel();
 
             if (!channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_HISTORY)) {
                 return;
             }
         }
 
-        message.addReaction(errorReaction).queue(null, (ignored) -> {
-        });
+        message.addReaction(Emoji.fromUnicode(errorReaction)).queue(null, (ignored) -> {});
     }
 
     /**
@@ -121,7 +126,7 @@ public class MessageUtils {
 
         sendMsg(
             new MessageConfig.Builder()
-                .setChannel(message.getTextChannel())
+                .setChannel(message.getChannel())
                 .setMessage(text)
         );
     }
@@ -134,11 +139,10 @@ public class MessageUtils {
      */
     public static void sendSuccess(Message message) {
         if (message.getChannelType() == ChannelType.TEXT) {
-            final TextChannel channel = message.getTextChannel();
+            final TextChannel channel = message.getChannel().asTextChannel();
 
             if (channel.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_HISTORY)) {
-                message.addReaction(successReaction).queue(null, (ignored) -> {
-                });
+                message.addReaction(Emoji.fromUnicode(successReaction)).queue(null, (ignored) -> {});
             }
         }
     }
@@ -156,7 +160,7 @@ public class MessageUtils {
 
         sendMsg(
             new MessageConfig.Builder()
-                .setChannel(message.getTextChannel())
+                .setChannel(message.getChannel())
                 .setMessage(text)
         );
     }
@@ -172,22 +176,24 @@ public class MessageUtils {
     public static void editMsg(Message message, Message newContent) {
         if (message == null || newContent == null) return;
         if (newContent.getEmbeds().size() > 0) {
-            if (!message.getGuild().getSelfMember().hasPermission(message.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
-                final MessageBuilder mb = new MessageBuilder()
+            if (!message.getGuild().getSelfMember().hasPermission(message.getGuildChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+                final StringBuilder mb = new StringBuilder()
                     .append(newContent.getContentRaw())
                     .append('\n');
+
+
 
                 newContent.getEmbeds().forEach(
                     messageEmbed -> mb.append(embedToMessage(messageEmbed))
                 );
 
-                message.editMessage(mb.build()).queue();
+                message.editMessage(mb.toString()).queue();
 
                 return;
             }
         }
 
-        message.editMessage(newContent).queue();
+        message.editMessage(MessageEditData.fromMessage(newContent)).queue();
     }
 
     /**
@@ -240,38 +246,6 @@ public class MessageUtils {
         );
     }
 
-    /*
-    Undocumented, for internal use only
-     */
-    public static void sendMsg(@Nullable TextChannel channel, String message) {
-        if (channel == null) {
-            return;
-        }
-
-        sendMsg(
-            new MessageConfig.Builder()
-                .setChannel(channel)
-                .setMessage(message)
-                .build()
-        );
-    }
-
-    /*
-    Undocumented, for internal use only
-     */
-    public static void sendEmbed(TextChannel channel, EmbedBuilder embed, boolean raw) {
-        if (channel == null) {
-            return;
-        }
-
-        sendMsg(
-            new MessageConfig.Builder()
-                .setChannel(channel)
-                .setEmbeds(raw, embed)
-                .build()
-        );
-    }
-
     /**
      * Shortcut for the lazy that don't want to build their config before sending a message, calls {@link
      * MessageConfig.Builder#build()} underwater
@@ -290,10 +264,10 @@ public class MessageUtils {
      *     The configuration on how to send the message
      */
     public static void sendMsg(@Nonnull MessageConfig config) {
-        final MessageChannel channel = config.getChannel();
+        final MessageChannelUnion channel = config.getChannel();
         final JDA jda = channel.getJDA();
         // refresh the entity
-        final MessageChannel channelById = jda.getChannelById(MessageChannel.class, channel.getIdLong());
+        final MessageChannelUnion channelById = jda.getChannelById(MessageChannelUnion.class, channel.getIdLong());
 
         if (channelById == null) {
             throw new IllegalArgumentException("Channel does not seem to exist on JDA#getTextChannelById???");
@@ -305,7 +279,7 @@ public class MessageUtils {
         }
 
         boolean canReply = true;
-        final MessageBuilder messageBuilder = config.getMessageBuilder();
+        final MessageCreateBuilder messageBuilder = config.getMessageBuilder();
         final List<EmbedBuilder> embeds = config.getEmbeds();
 
         if (channelById instanceof GuildMessageChannel) {
@@ -348,16 +322,16 @@ public class MessageUtils {
 
         final Consumer<? super Throwable> failureAction = config.getFailureAction();
         final Consumer<? super Message> successAction = config.getSuccessAction();
-        final Consumer<MessageAction> actionConfig = config.getActionConfig();
+        final Consumer<MessageCreateAction> actionConfig = config.getActionConfig();
         final boolean finalCanReply = canReply; // fuck java 8 :(
 
         // if the message is small enough we can just send it
-        if (messageBuilder.length() <= Message.MAX_CONTENT_LENGTH) {
-            final MessageAction messageAction = channel.sendMessage(messageBuilder.build());
+        if (messageBuilder.getContent().length() <= Message.MAX_CONTENT_LENGTH) {
+            final MessageCreateAction messageAction = channel.sendMessage(messageBuilder.build());
 
             if (config.getReplyToId() > 0 && finalCanReply) {
                 //noinspection ResultOfMethodCallIgnored
-                messageAction.referenceById(config.getReplyToId())
+                messageAction.setMessageReference(config.getReplyToId())
                     .mentionRepliedUser(config.isMentionRepliedUser());
             }
 
@@ -366,19 +340,28 @@ public class MessageUtils {
             return;
         }
 
-        messageBuilder.buildAll(SplitPolicy.SPACE, SplitPolicy.NEWLINE).forEach(
+        // TODO:
+        /*List<String> messages = SplitUtil.split(
+            someLargeString,  // input string of arbitrary length
+            2000,             // the split limit, can be arbitrary (>0)
+            true,             // whether to trim the strings (empty will be discarded)
+            Strategy.NEWLINE, // split on '\n' characters if possible
+            Strategy.ANYWHERE // otherwise split on the limit
+        );*/
+
+        /*messageBuilder.buildAll(SplitPolicy.SPACE, SplitPolicy.NEWLINE).forEach(
             (message) -> {
-                final MessageAction messageAction = channel.sendMessage(message);
+                final MessageCreateAction messageAction = channel.sendMessage(message);
 
                 if (config.getReplyToId() > 0 && finalCanReply) {
                     //noinspection ResultOfMethodCallIgnored
-                    messageAction.referenceById(config.getReplyToId())
+                    messageAction.setMessageReference(config.getReplyToId())
                         .mentionRepliedUser(config.isMentionRepliedUser());
                 }
 
                 actionConfig.accept(messageAction);
                 messageAction.queue(successAction, failureAction);
             }
-        );
+        );*/
     }
 }

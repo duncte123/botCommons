@@ -36,17 +36,19 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-val jdaVersion = "5.0.0-alpha.9"
+val jdaVersion = "5.0.0-alpha.22"
 
 dependencies {
-    api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.10.1")
-    api(group = "org.jsoup", name = "jsoup", version = "1.13.1")
-    api(group = "com.squareup.okhttp3", name = "okhttp", version = "3.14.9")
+    api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.13.2.2")
+    api(group = "org.jsoup", name = "jsoup", version = "1.15.3")
+    api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.3")
     api(group = "me.duncte123", name = "reliqua", version = "2.6.5") {
         exclude(group = "com.squareup.okhttp3", module = "okhttp")
     }
 
-    compileOnly(group = "org.json", name = "json", version = "20180813") // Provided by the user
+    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+
+    compileOnly(group = "org.json", name = "json", version = "20220924") // Provided by the user
     compileOnly(group = "net.dv8tion", name = "JDA", version = jdaVersion) {
         exclude(module = "opus-java")
     }
@@ -55,7 +57,7 @@ dependencies {
         exclude(module = "opus-java")
     }
     testImplementation(group = "junit", name = "junit", version = "4.12")
-    testImplementation("com.squareup.okhttp3:mockwebserver:3.14.4")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
 
 }
 
@@ -138,6 +140,6 @@ publish.apply {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "6.8"
-    distributionType = Wrapper.DistributionType.ALL
+    gradleVersion = "7.5.1"
+    distributionType = Wrapper.DistributionType.BIN
 }
