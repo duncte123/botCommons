@@ -47,6 +47,6 @@ public class PlainTextRequestBody implements IRequestBody {
 
     @Override
     public @NotNull RequestBody toRequestBody() {
-        return RequestBody.create(null, this.body.toString().getBytes());
+        return RequestBody.create(this.body.toString().getBytes());
     }
 }

@@ -21,6 +21,7 @@ import me.duncte123.botcommons.commands.ICommandContext;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -40,9 +41,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MessageConfig {
-    private static Function<MessageChannelUnion, String> nonceSupplier = (c) -> c.getId() + System.currentTimeMillis();
+    private static Function<MessageChannel, String> nonceSupplier = (c) -> c.getId() + System.currentTimeMillis();
 
-    private final MessageChannelUnion channel;
+    private final MessageChannel channel;
     private final MessageCreateBuilder messageBuilder;
     private final List<EmbedBuilder> embeds;
     private final long replyToId;
@@ -74,7 +75,7 @@ public class MessageConfig {
      *
      * @see Builder
      */
-    public MessageConfig(MessageChannelUnion channel, MessageCreateBuilder messageBuilder, Collection<? extends EmbedBuilder> embeds, long replyToId,
+    public MessageConfig(MessageChannel channel, MessageCreateBuilder messageBuilder, Collection<? extends EmbedBuilder> embeds, long replyToId,
                          boolean mentionRepliedUser, Consumer<? super Throwable> failureAction,
                          Consumer<? super Message> successAction, Consumer<MessageCreateAction> actionConfig) {
 
@@ -98,7 +99,7 @@ public class MessageConfig {
      *
      * @return The text channel that the message will be sent in
      */
-    public MessageChannelUnion getChannel() {
+    public MessageChannel getChannel() {
         return this.channel;
     }
 
@@ -172,10 +173,10 @@ public class MessageConfig {
      * A nonce can be used to verify if the message you recieve is the message you want
      *
      * @param nonceSupplier
-     *     A function that returns the nonce, by default this is the {@link MessageChannelUnion#getId() channel id} combined
+     *     A function that returns the nonce, by default this is the {@link MessageChannel#getId() channel id} combined
      *     with the {@link System#currentTimeMillis() current time in milliseconds}
      */
-    public static void setNonceSupplier(Function<MessageChannelUnion, String> nonceSupplier) {
+    public static void setNonceSupplier(Function<MessageChannel, String> nonceSupplier) {
         Checks.notNull(nonceSupplier, "nonceSupplier");
 
         MessageConfig.nonceSupplier = nonceSupplier;
@@ -190,7 +191,7 @@ public class MessageConfig {
         private MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
         private long replyToId;
         private boolean mentionRepliedUser = MessageRequest.isDefaultMentionRepliedUser();
-        private MessageChannelUnion channel;
+        private MessageChannel channel;
         private Consumer<? super Throwable> failureAction = RestAction.getDefaultFailure();
         private Consumer<? super Message> successAction = RestAction.getDefaultSuccess();
         private Consumer<MessageCreateAction> actionConfig = (a) -> {
@@ -203,8 +204,27 @@ public class MessageConfig {
          *     the channel that the message will be sent to
          *
          * @return The builder instance, useful for chaining
+         *
+         * @see #setChannel(MessageChannel)
          */
         public Builder setChannel(@Nonnull MessageChannelUnion channel) {
+            Checks.notNull(channel, "channel");
+
+            this.channel = channel;
+            return this;
+        }
+
+        /**
+         * Sets the channel that the message will be sent to
+         *
+         * @param channel
+         *     the channel that the message will be sent to
+         *
+         * @return The builder instance, useful for chaining
+         *
+         * @see #setChannel(MessageChannelUnion)
+         */
+        public Builder setChannel(@Nonnull MessageChannel channel) {
             Checks.notNull(channel, "channel");
 
             this.channel = channel;

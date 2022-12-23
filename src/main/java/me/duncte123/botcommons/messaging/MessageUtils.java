@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
@@ -264,10 +265,10 @@ public class MessageUtils {
      *     The configuration on how to send the message
      */
     public static void sendMsg(@Nonnull MessageConfig config) {
-        final MessageChannelUnion channel = config.getChannel();
+        final MessageChannel channel = config.getChannel();
         final JDA jda = channel.getJDA();
         // refresh the entity
-        final MessageChannelUnion channelById = jda.getChannelById(MessageChannelUnion.class, channel.getIdLong());
+        final MessageChannel channelById = jda.getChannelById(MessageChannel.class, channel.getIdLong());
 
         if (channelById == null) {
             throw new IllegalArgumentException("Channel does not seem to exist on JDA#getTextChannelById???");

@@ -36,7 +36,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-val jdaVersion = "5.0.0-alpha.22"
+val jdaVersion = "5.0.0-beta.2"
 
 dependencies {
     api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.13.2.2")

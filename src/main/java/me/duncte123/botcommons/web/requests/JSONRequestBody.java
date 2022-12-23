@@ -69,6 +69,6 @@ public class JSONRequestBody implements IRequestBody {
 
     @Override
     public @NotNull RequestBody toRequestBody() {
-        return RequestBody.create(null, json);
+        return RequestBody.create(json);
     }
 }
