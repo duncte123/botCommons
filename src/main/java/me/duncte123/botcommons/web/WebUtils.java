@@ -395,12 +395,24 @@ public final class WebUtils extends Reliqua {
      * @return
      */
     public PendingRequestBuilder postRequest(String url, IRequestBody body) {
-        return createRequest(
-            defaultRequest()
-                .url(url)
-                .header("content-Type", body.getContentType().getType())
-                .post(body.toRequestBody())
-        );
+        return postRequest(url, body, null);
+    }
+
+    /**
+     *
+     * @param url
+     * @param body
+     * @param requestBuilder
+     * @return
+     */
+    public PendingRequestBuilder postRequest(String url, IRequestBody body, @Nullable RequestBuilderFunction requestBuilder) {
+        final Request.Builder builder = defaultRequest()
+            .url(url)
+            .header("content-Type", body.getContentType().getType())
+            .post(body.toRequestBody());
+
+        // We return the builder so there is no need to have it as param
+        return applyFunctions(builder, null, requestBuilder);
     }
 
     /**
@@ -444,15 +456,15 @@ public final class WebUtils extends Reliqua {
         return createRequest(request).build(mapper, WebParserUtils::handleError);
     }
 
-    private PendingRequestBuilder applyFunctions(Request.Builder builder, @Nullable PendingRequestFunction fn1, @Nullable RequestBuilderFunction fn2) {
-        if (fn2 != null) {
-            builder = fn2.apply(builder);
+    private PendingRequestBuilder applyFunctions(Request.Builder builder, @Nullable PendingRequestFunction pendingBuilder, @Nullable RequestBuilderFunction requestBuilder) {
+        if (requestBuilder != null) {
+            builder = requestBuilder.apply(builder);
         }
 
         PendingRequestBuilder pendingRequestBuilder = createRequest(builder);
 
-        if (fn1 != null) {
-            pendingRequestBuilder = fn1.apply(pendingRequestBuilder);
+        if (pendingBuilder != null) {
+            pendingRequestBuilder = pendingBuilder.apply(pendingRequestBuilder);
         }
 
         return pendingRequestBuilder;

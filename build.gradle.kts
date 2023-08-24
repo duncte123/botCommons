@@ -36,7 +36,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-val jdaVersion = "5.0.0-beta.2"
+val jdaVersion = "5.0.0-beta.13"
 
 dependencies {
     api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.13.2.2")
@@ -140,6 +140,6 @@ publish.apply {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "7.5.1"
+    gradleVersion = "8.2.1"
     distributionType = Wrapper.DistributionType.BIN
 }
