@@ -19,7 +19,9 @@ package me.duncte123.botcommons.messaging;
 import me.duncte123.botcommons.StringUtils;
 import me.duncte123.botcommons.commands.ICommandContext;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.MessageType;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -37,12 +39,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MessageConfig {
-    private static Function<MessageChannel, String> nonceSupplier = (c) -> c.getId() + System.currentTimeMillis();
-
     private final MessageChannel channel;
     private final MessageCreateBuilder messageBuilder;
     private final List<EmbedBuilder> embeds;
@@ -166,20 +165,6 @@ public class MessageConfig {
      */
     public Consumer<MessageCreateAction> getActionConfig() {
         return this.actionConfig;
-    }
-
-    /**
-     * Sets the supplier for the nonce.<br/>
-     * A nonce can be used to verify if the message you recieve is the message you want
-     *
-     * @param nonceSupplier
-     *     A function that returns the nonce, by default this is the {@link MessageChannel#getId() channel id} combined
-     *     with the {@link System#currentTimeMillis() current time in milliseconds}
-     */
-    public static void setNonceSupplier(Function<MessageChannel, String> nonceSupplier) {
-        Checks.notNull(nonceSupplier, "nonceSupplier");
-
-        MessageConfig.nonceSupplier = nonceSupplier;
     }
 
     /**
@@ -656,11 +641,7 @@ public class MessageConfig {
                 this.mentionRepliedUser,
                 this.failureAction,
                 this.successAction,
-                (config) -> {
-                    // Set the nonce for the message
-                    config.setNonce(nonceSupplier.apply(this.channel));
-                    this.actionConfig.accept(config);
-                }
+                this.actionConfig
             );
         }
 

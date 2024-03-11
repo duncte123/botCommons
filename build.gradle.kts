@@ -21,7 +21,7 @@ plugins {
 }
 
 group = "me.duncte123"
-version = "${getVersionPrefix()}3.0.${getBuildNum()}"
+version = "${getVersionPrefix()}3.1.${getBuildNum()}"
 val archivesBaseName = "botCommons"
 
 repositories {
@@ -36,10 +36,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-val jdaVersion = "5.0.0-beta.13"
+val jdaVersion = "5.0.0-beta.21"
 
 dependencies {
-    api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.13.2.2")
+    api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.16.1")
     api(group = "org.jsoup", name = "jsoup", version = "1.15.3")
     api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.3")
     api(group = "me.duncte123", name = "reliqua", version = "2.6.5") {
