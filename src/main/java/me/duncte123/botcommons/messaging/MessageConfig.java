@@ -463,6 +463,20 @@ public class MessageConfig {
         }
 
         /**
+         * Allows you to override the message builder
+         *
+         * @param messageBuilder
+         *     the new message builder to use
+         *
+         * @return The builder instance, useful for chaining
+         */
+        public Builder setMessageBuilder(MessageCreateBuilder messageBuilder) {
+            this.messageBuilder = messageBuilder;
+
+            return this;
+        }
+
+        /**
          * Applies a configuration to the message builder
          *
          * @param consumer
