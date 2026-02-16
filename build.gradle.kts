@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.register
+
 /*
  *    Copyright 2018 - 2019 Duncan "duncte123" Sterken
  *
@@ -21,7 +23,7 @@ plugins {
 }
 
 group = "me.duncte123"
-version = "${getVersionPrefix()}3.1.${getBuildNum()}"
+version = "${getVersionPrefix()}3.2.${getBuildNum()}"
 val archivesBaseName = "botCommons"
 
 repositories {
@@ -36,7 +38,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-val jdaVersion = "5.0.0-beta.21"
+val jdaVersion = "6.3.1"
 
 dependencies {
     api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.16.1")
@@ -86,12 +88,12 @@ javadoc.apply {
     isFailOnError = false
 }
 
-val sourcesJar = task<Jar>("sourcesJar") {
+val sourcesJar = tasks.register<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
     from(sourceSets["main"].allJava)
 }
 
-val javadocJar = task<Jar>("javadocJar") {
+val javadocJar = tasks.register<Jar>("javadocJar") {
     dependsOn(javadoc)
     archiveClassifier.set("javadoc")
 }
@@ -127,8 +129,8 @@ build.apply {
     dependsOn(sourcesJar)
 
     jar.mustRunAfter(clean)
-    javadocJar.mustRunAfter(jar)
-    sourcesJar.mustRunAfter(javadocJar)
+    javadocJar.get().mustRunAfter(jar)
+    sourcesJar.get().mustRunAfter(javadocJar)
 }
 
 publish.apply {
@@ -140,6 +142,6 @@ publish.apply {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "8.2.1"
+    gradleVersion = "9.3.1"
     distributionType = Wrapper.DistributionType.BIN
 }
